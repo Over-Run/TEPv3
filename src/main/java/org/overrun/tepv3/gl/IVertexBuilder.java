@@ -22,28 +22,53 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
-
-import org.overrun.tepv3.gl.RenderSystem;
-import org.overrun.tepv3.gl.VertexBuilder;
-import org.overrun.tepv3.gl.VertexLayout;
+package org.overrun.tepv3.gl;
 
 /**
- * <h2>The mesh</h2>
- * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
- * built model. You can use the mesh if you don't need to draw the scene
- * dynamically.
- *
  * @author squid233
  * @since 3.0.1
  */
-public interface IMesh {
+public interface IVertexBuilder {
     /**
-     * Use current {@link RenderSystem} states to render.
+     * Push a vertex.
+     *
+     * @param x Pos x
+     * @param y Pos y
+     * @param z Pos z
+     * @return this
      */
-    void render();
+    IVertexBuilder vertex(float x, float y, float z);
 
-    float[] getRawData();
+    /**
+     * Push a color.
+     *
+     * @param r red
+     * @param g green
+     * @param b blue
+     * @param a alpha default to 1
+     * @return this
+     */
+    IVertexBuilder color(float r, float g, float b, float a);
 
-    VertexLayout getLayout();
+    /**
+     * Push a color.
+     *
+     * @param r red
+     * @param g green
+     * @param b blue
+     * @return this
+     */
+    IVertexBuilder color(float r, float g, float b);
+
+    void array(VertexLayout layout, float[] rawData);
+
+    void next(float x,
+              float y,
+              float z,
+              float r,
+              float g,
+              float b,
+              float a);
+
+    void next();
 }

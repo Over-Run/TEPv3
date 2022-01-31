@@ -24,10 +24,12 @@
 
 package org.overrun.tepv3.game.client;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.tepv3.gl.RenderSystem;
 import org.overrun.tepv3.gl.ShaderProgram;
-import org.overrun.tepv3.gl.VertexBuilder;
+import org.overrun.tepv3.model.IMesh;
+import org.overrun.tepv3.model.ModelsBuilder;
 import org.overrun.tepv3.scene.GLFWScene;
 
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
@@ -41,6 +43,7 @@ import static org.overrun.tepv3.game.client.RunArgs.*;
  */
 public class TEPv3Game extends GLFWScene {
     private static TEPv3Game instance;
+    private IMesh colorfulTriangle;
 
     public TEPv3Game() {
         super(INIT_WIDTH, INIT_HEIGHT, INIT_TITLE);
@@ -55,18 +58,22 @@ public class TEPv3Game extends GLFWScene {
         glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
         if (false) //#ifdef _DEBUG
             GLUtil.setupDebugMessageCallback(System.err);
+
+        colorfulTriangle = ModelsBuilder.buildTriangle(
+            new Vector3f(0, 0.5f, 0),
+            new Vector3f(-0.5f, -0.5f, 0),
+            new Vector3f(0.5f, -0.5f, 0),
+            new Vector3f(1, 0, 0),
+            new Vector3f(0, 1, 0),
+            new Vector3f(0, 0, 1)
+        );
     }
 
     @Override
     public void render(double delta) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         RenderSystem.useShader(ShaderProgram.POS_COLOR);
-        var gl = VertexBuilder.getInstance();
-        gl.begin(GL_TRIANGLES);
-        gl.color(1, 0, 0).vertex(0, 0.5f, 0).next();
-        gl.color(0, 1, 0).vertex(-0.5f, -0.5f, 0).next();
-        gl.color(0, 0, 1).vertex(0.5f, -0.5f, 0).next();
-        gl.end();
+        colorfulTriangle.render();
     }
 
     @Override

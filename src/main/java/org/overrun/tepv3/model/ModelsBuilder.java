@@ -24,9 +24,38 @@
 
 package org.overrun.tepv3.model;
 
+import org.joml.Vector3f;
+
 /**
+ * The builder to build the models.
+ *
  * @author squid233
  * @since 3.0.1
  */
-public interface IModel {
+public class ModelsBuilder {
+    /**
+     * Build a triangle model with colors.
+     *
+     * @param p0 The 1st point
+     * @param p1 The 2nd point
+     * @param p2 The 3rd point
+     * @param c0 The 1st color
+     * @param c1 The 2nd color
+     * @param c2 The 3rd color
+     * @return The mesh may be {@link Mesh32} or {@code Mesh20}
+     */
+    public static IMesh buildTriangle(final Vector3f p0,
+                                      final Vector3f p1,
+                                      final Vector3f p2,
+                                      final Vector3f c0,
+                                      final Vector3f c1,
+                                      final Vector3f c2) {
+        //if (GLStateMgr.hasGL32())
+        var builder = new Mesh32.Builder();
+        builder.color(c0.x, c0.y, c0.z).vertex(p0.x, p0.y, p0.z).next();
+        builder.color(c1.x, c1.y, c1.z).vertex(p1.x, p1.y, p1.z).next();
+        builder.color(c2.x, c2.y, c2.z).vertex(p2.x, p2.y, p2.z).next();
+        return builder.build();
+        //else
+    }
 }

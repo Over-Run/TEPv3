@@ -40,6 +40,8 @@ import static org.overrun.tepv3.util.BuiltinResources.getContent;
  * @since 3.0.1
  */
 public class ShaderProgram {
+    private static final HashMap<VertexLayout, ShaderProgram> LAYOUT2PROGRAM =
+        new HashMap<>();
     public static final ShaderProgram POS_COLOR =
         new Builder()
             .filename("position_color")
@@ -103,6 +105,7 @@ public class ShaderProgram {
         layout = new VertexLayout(formats);
         this.filename32 = filename32;
         this.gl20 = gl20;
+        LAYOUT2PROGRAM.put(layout, this);
     }
 
     public void setMatrix4(String name, Matrix4fc mat) {
@@ -171,6 +174,16 @@ public class ShaderProgram {
         }
         glAttachShader(handle, id);
         return id;
+    }
+
+    /**
+     * Get the {@link ShaderProgram} by the {@link VertexLayout}.
+     *
+     * @param layout The layout.
+     * @return The program.
+     */
+    public static ShaderProgram getByLayout(VertexLayout layout) {
+        return LAYOUT2PROGRAM.get(layout);
     }
 
     /**

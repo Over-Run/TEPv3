@@ -48,7 +48,7 @@ public class VertexLayout {
         formats.forEach(format -> {
             if (format == VertexFormat.VERTEX3F)
                 hasPos = true;
-            if (format == VertexFormat.COLOR4F)
+            else if (format == VertexFormat.COLOR4F)
                 hasColor = true;
             stride += format.getBytes();
             mask |= format.getMask();

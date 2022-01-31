@@ -32,10 +32,12 @@ import static org.overrun.tepv3.gl.VertexFormat.COLOR4F;
 import static org.overrun.tepv3.gl.VertexFormat.VERTEX3F;
 
 /**
+ * The buffered implementation of {@link IVertexBuilder}.
+ *
  * @author squid233
  * @since 3.0.1
  */
-public class VertexBuilder {
+public class VertexBuilder implements IVertexBuilder {
     private static final VertexBuilder INSTANCE = new VertexBuilder();
     private static int memSize = 0x80000;
     private static float[] array = new float[memSize];
@@ -65,13 +67,7 @@ public class VertexBuilder {
         this.primitive = primitive;
     }
 
-    /**
-     * Push a vertex.
-     *
-     * @param x x
-     * @param y y
-     * @param z z
-     */
+    @Override
     public VertexBuilder vertex(float x, float y, float z) {
         this.x = x;
         this.y = y;
@@ -79,14 +75,7 @@ public class VertexBuilder {
         return this;
     }
 
-    /**
-     * Push a color.
-     *
-     * @param r red
-     * @param g green
-     * @param b blue
-     * @param a alpha default to 1
-     */
+    @Override
     public VertexBuilder color(float r, float g, float b, float a) {
         hasColor = true;
         this.r = r;
@@ -96,19 +85,13 @@ public class VertexBuilder {
         return this;
     }
 
-    /**
-     * Push a color.
-     *
-     * @param r red
-     * @param g green
-     * @param b blue
-     */
+    @Override
     public VertexBuilder color(float r, float g, float b) {
         return color(r, g, b, 1);
     }
 
-    public void array(float[] rawData) {
-        var layout = RenderSystem.getShader().getLayout();
+    @Override
+    public void array(VertexLayout layout, float[] rawData) {
         for (int i = 0; i < rawData.length; ) {
             float x = 0, y = 0, z = 0, r = 0, g = 0, b = 0, a = 0;
             for (var fmt : layout.getFormats()) {
@@ -131,6 +114,10 @@ public class VertexBuilder {
         }
     }
 
+    public void array(float[] rawData) {
+        array(RenderSystem.getShader().getLayout(), rawData);
+    }
+
     private void checkBufSz(int inc) {
         if (pos + inc >= memSize) {
             memSize += 0x800;
@@ -141,6 +128,7 @@ public class VertexBuilder {
         }
     }
 
+    @Override
     public void next(float x,
                      float y,
                      float z,
@@ -176,6 +164,7 @@ public class VertexBuilder {
         ++vertexCount;
     }
 
+    @Override
     public void next() {
         next(x, y, z, r, g, b, a);
     }
@@ -199,8 +188,8 @@ public class VertexBuilder {
         var layout = shader.getLayout();
         if (layout.hasPos()) {
             var pos = vars.get("Position");
-            glEnableVertexAttribArray(pos.location);
-            glVertexAttribPointer(pos.location,
+            glEnableVertexAttribArray(pos.getLocation());
+            glVertexAttribPointer(pos.getLocation(),
                 VERTEX3F.getCount(),
                 GL_FLOAT,
                 false,
@@ -209,8 +198,8 @@ public class VertexBuilder {
         }
         if (layout.hasColor()) {
             var color = vars.get("Color");
-            glEnableVertexAttribArray(color.location);
-            glVertexAttribPointer(color.location,
+            glEnableVertexAttribArray(color.getLocation());
+            glVertexAttribPointer(color.getLocation(),
                 COLOR4F.getCount(),
                 GL_FLOAT,
                 false,

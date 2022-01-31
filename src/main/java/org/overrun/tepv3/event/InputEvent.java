@@ -29,6 +29,8 @@ import org.lwjgl.glfw.GLFWKeyCallbackI;
 import static org.overrun.tepv3.event.EventFactory.create;
 
 /**
+ * This is the example event.
+ *
  * @author squid233
  * @since 3.0.1
  */
