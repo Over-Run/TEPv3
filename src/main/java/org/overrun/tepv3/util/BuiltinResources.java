@@ -49,8 +49,8 @@ public class BuiltinResources {
                 sb.append("\n").append(ln);
             }
             return sb.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Can't find resource {" + filename + "}", e);
         }
     }
 }

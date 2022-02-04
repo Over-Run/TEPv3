@@ -24,6 +24,7 @@
 
 package org.overrun.tepv3;
 
+import org.lwjgl.glfw.GLFWCursorPosCallbackI;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 
@@ -41,6 +42,8 @@ public class Window {
     private boolean created = false;
     private String title;
     private long handle = NULL;
+    private boolean isGrabbed;
+    private boolean isRawMouseMotion;
 
     public void create(final int width,
                        final int height,
@@ -61,6 +64,10 @@ public class Window {
 
     public void onKey(GLFWKeyCallbackI cb) {
         glfwSetKeyCallback(handle, cb);
+    }
+
+    public void onCursorPos(GLFWCursorPosCallbackI cb) {
+        glfwSetCursorPosCallback(handle, cb);
     }
 
     public void onResizing(GLFWFramebufferSizeCallbackI cb) {
@@ -89,6 +96,52 @@ public class Window {
 
     public void setPos(int x, int y) {
         glfwSetWindowPos(handle, x, y);
+    }
+
+    public void setCursorPos(double x, double y) {
+        glfwSetCursorPos(handle, x, y);
+    }
+
+    /**
+     * Returns the last state reported for the specified key to this window.
+     *
+     * @param key the desired keyboard key
+     * @return one of {@link org.lwjgl.glfw.GLFW#GLFW_PRESS PRESS} or {@link org.lwjgl.glfw.GLFW#GLFW_RELEASE RELEASE}
+     */
+    public int getKey(int key) {
+        return glfwGetKey(handle, key);
+    }
+
+    public boolean isKeyDown(int key) {
+        return getKey(key) == GLFW_PRESS;
+    }
+
+    public boolean isKeyUp(int key) {
+        return getKey(key) == GLFW_RELEASE;
+    }
+
+    public void setGrabbed(boolean grabbed) {
+        isGrabbed = grabbed;
+        glfwSetInputMode(handle,
+            GLFW_CURSOR,
+            grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    }
+
+    public boolean isGrabbed() {
+        return isGrabbed;
+    }
+
+    public void setRawMouseMotion(boolean rawMouseMotion) {
+        if (glfwRawMouseMotionSupported()) {
+            isRawMouseMotion = rawMouseMotion;
+            glfwSetInputMode(handle,
+                GLFW_RAW_MOUSE_MOTION,
+                rawMouseMotion ? GLFW_TRUE : GLFW_FALSE);
+        }
+    }
+
+    public boolean isRawMouseMotion() {
+        return isRawMouseMotion;
     }
 
     public void freeCallbacks() {

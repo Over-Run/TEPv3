@@ -26,16 +26,15 @@ package org.overrun.tepv3.scene;
 
 import org.lwjgl.opengl.GL;
 import org.overrun.tepv3.Window;
-import org.overrun.tepv3.event.InputEvent;
 import org.overrun.tepv3.gl.ShaderProgram;
 import org.overrun.tepv3.gl.VertexBuilder;
 import org.overrun.tepv3.util.Timer;
 
+import static java.lang.Math.floor;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFWErrorCallback.createPrint;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.overrun.tepv3.Configs.*;
-import static org.overrun.tepv3.gl.GLStateMgr.forceGL20;
 
 /**
  * The scene implemented using GLFW.
@@ -46,6 +45,9 @@ import static org.overrun.tepv3.gl.GLStateMgr.forceGL20;
  *     </tr>
  *     <tr><td>{@link #onStarting()}</td>
  *         <td>It will be called on calling {@link #start()}.</td>
+ *     </tr>
+ *     <tr><td>{@link #setWindowHints()}</td>
+ *         <td>It will be called on setting window hints.</td>
  *     </tr>
  *     <tr><td>{@link #init()}</td>
  *         <td>It will be called after {@link GL#createCapabilities(boolean) creating} OpenGL capabilities.</td>
@@ -74,6 +76,10 @@ public class GLFWScene extends Scene implements Runnable {
      * The timer with config tps
      */
     protected final Timer timer = new Timer(tps);
+    /**
+     * Cursor pos
+     */
+    protected int mouseX, mouseY, deltaMX, deltaMY;
 
     public GLFWScene(int width, int height, String title) {
         viewport = new Viewport.Mutable(width, height);
@@ -89,15 +95,24 @@ public class GLFWScene extends Scene implements Runnable {
         if (!glfwInit())
             glfwInitFailed.run();
         glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, forceGL20 ? 2 : 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, forceGL20 ? 0 : 2);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, forceGL20
-            ? GLFW_OPENGL_ANY_PROFILE
-            : GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        setWindowHints();
         window.create(getWidth(), getHeight(), window.getTitle(), NULL, NULL);
         window.check(glfwWindowCreateFailed);
-        window.onKey(InputEvent::send);
+        window.onKey(this::onKey);
+        window.onCursorPos((handle, xpos, ypos) -> {
+            int nx = (int) floor(xpos), ny = (int) floor(ypos);
+            deltaMX = nx - mouseX;
+            deltaMY = ny - mouseY;
+            onCursorPos(nx, ny, deltaMX, deltaMY);
+            mouseX = nx;
+            mouseY = ny;
+            deltaMX = 0;
+            deltaMY = 0;
+        });
         window.onResizing((handle, width, height) -> {
             viewport.setWidth(width);
             viewport.setHeight(height);
@@ -144,6 +159,18 @@ public class GLFWScene extends Scene implements Runnable {
      * It will be called on calling {@link #start()}.
      */
     public void onStarting() {
+    }
+
+    /**
+     * It will be called on setting window hints.
+     */
+    public void setWindowHints() {
+    }
+
+    public void onKey(long window, int key, int scancode, int action, int mods) {
+    }
+
+    public void onCursorPos(int x, int y, int deltaX, int deltaY) {
     }
 
     /**

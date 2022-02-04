@@ -1,14 +1,16 @@
 # The Experimental Project v3
 
+[English](README.md) · [简体中文](README-zh-cn.md)
+
 ## What
 
 Hi there. Here is the Experimental Project v3.
 
-This is a game engine. It used OpenGL 3.2 core profile. Also, if the user computer doesn't support to OpenGL 3.2, the engine will use the GL 2.0 fallback.
+This is a game engine and game. It used OpenGL 3.2 core profile.
 
 ## Why
 
-We note that, the other game engine are very large. So we made this project.
+We note that, the other game engine are very large. So we start this project.
 
 ## How
 
@@ -23,4 +25,4 @@ dependencies {
 
 ## The JVM Args
 
-- `-Dtepv3.forceGL20=true`: Force using the GL 2.0 fallback
+~~Nothing~~

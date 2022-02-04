@@ -32,7 +32,7 @@ import java.util.function.Function;
  * @since 3.0.1
  */
 public class EventFactory {
-    public static <T extends IEvent> ListBackedEvent<T> create(Function<List<T>, T> factory) {
+    public static <T> ListBackedEvent<T> create(Function<List<T>, T> factory) {
         return new ListBackedEvent<>(factory);
     }
 }

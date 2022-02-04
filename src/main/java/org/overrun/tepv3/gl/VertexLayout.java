@@ -35,7 +35,7 @@ public class VertexLayout {
      * The format set
      */
     private final LinkedHashSet<VertexFormat> formats = new LinkedHashSet<>();
-    private boolean hasPos, hasColor;
+    private boolean hasPos, hasColor, hasTexture;
     private int stride = 0;
     private int mask = 0;
     private int count = 0;
@@ -50,6 +50,8 @@ public class VertexLayout {
                 hasPos = true;
             else if (format == VertexFormat.COLOR4F)
                 hasColor = true;
+            else if (format == VertexFormat.TEX2F)
+                hasTexture = true;
             stride += format.getBytes();
             mask |= format.getMask();
             count += format.getCount();
@@ -63,6 +65,10 @@ public class VertexLayout {
 
     public boolean hasColor() {
         return hasColor;
+    }
+
+    public boolean hasTexture() {
+        return hasTexture;
     }
 
     public LinkedHashSet<VertexFormat> getFormats() {
@@ -130,6 +136,7 @@ public class VertexLayout {
             .add("formats=" + formats)
             .add("hasPos=" + hasPos)
             .add("hasColor=" + hasColor)
+            .add("hasTexture=" + hasTexture)
             .add("stride=" + stride)
             .add("mask=" + mask)
             .add("count=" + count)

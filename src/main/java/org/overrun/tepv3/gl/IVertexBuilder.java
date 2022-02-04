@@ -42,10 +42,10 @@ public interface IVertexBuilder {
     /**
      * Push a color.
      *
-     * @param r red
-     * @param g green
-     * @param b blue
-     * @param a alpha default to 1
+     * @param r Color red
+     * @param g Color green
+     * @param b Color blue
+     * @param a Color alpha default to 1
      * @return this
      */
     IVertexBuilder color(float r, float g, float b, float a);
@@ -60,6 +60,21 @@ public interface IVertexBuilder {
      */
     IVertexBuilder color(float r, float g, float b);
 
+    /**
+     * Push a tex coord.
+     *
+     * @param u Coord u
+     * @param v Coord v
+     * @return this
+     */
+    IVertexBuilder tex(float u, float v);
+
+    /**
+     * Push an array.
+     *
+     * @param layout  The layout
+     * @param rawData The data
+     */
     void array(VertexLayout layout, float[] rawData);
 
     void next(float x,
@@ -68,7 +83,9 @@ public interface IVertexBuilder {
               float r,
               float g,
               float b,
-              float a);
+              float a,
+              float u,
+              float v);
 
     void next();
 }

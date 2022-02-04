@@ -26,6 +26,10 @@ package org.overrun.tepv3.gl;
 
 import org.joml.Matrix4fStack;
 import org.joml.Vector4f;
+import org.overrun.tepv3.util.Identifier;
+import org.overrun.tepv3.client.tex.TextureMgr;
+
+import static org.lwjgl.opengl.GL13.*;
 
 /**
  * @author squid233
@@ -39,6 +43,53 @@ public class RenderSystem {
         new Matrix4fStack(4);
     private static final Matrix4fStack modelView =
         new Matrix4fStack(32);
+    private static boolean depthTest;
+    private static int depthFunc = GL_LESS;
+    private static boolean multiSample;
+    private static boolean cullFace;
+    private static int currentTex2D;
+
+    public static void enableDepthTest() {
+        if (!depthTest) {
+            depthTest = true;
+            glEnable(GL_DEPTH_TEST);
+        }
+    }
+
+    public static void depthFunc(int func) {
+        if (depthFunc != func) {
+            depthFunc = func;
+            glDepthFunc(func);
+        }
+    }
+    public static void enableMultiSample() {
+        if (!multiSample) {
+            multiSample = true;
+            glEnable(GL_MULTISAMPLE);
+        }
+    }
+
+    public static void enableCullFace() {
+        if (!cullFace) {
+            cullFace = true;
+            glEnable(GL_CULL_FACE);
+        }
+    }
+
+    public static void setShaderTexture(int id) {
+        if (currentTex2D != id) {
+            currentTex2D = id;
+            glBindTexture(GL_TEXTURE_2D, id);
+        }
+    }
+
+    public static void setShaderTexture(Identifier id) {
+        setShaderTexture(TextureMgr.findTexture(id));
+    }
+
+    public static void activeTexture(int unit) {
+        glActiveTexture(GL_TEXTURE0 + unit);
+    }
 
     public static void setShaderColor(float r,
                                       float g,

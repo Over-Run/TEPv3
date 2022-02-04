@@ -32,7 +32,8 @@ import java.util.StringJoiner;
  */
 public enum VertexFormat {
     VERTEX3F(12, 1, 3),
-    COLOR4F(16, 1 << 1, 4);
+    COLOR4F(16, 1 << 1, 4),
+    TEX2F(8, 1 << 2, 2);
 
     private final int bytes;
     private final int mask;

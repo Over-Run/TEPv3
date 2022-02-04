@@ -32,6 +32,19 @@ dependencies {
     api 'org.joml:joml:1.10.3'
     api 'io.github.over-run:common-utils:0.3.0'
 
+    def nativeAttrib = [
+        'linux-arm32', 'linux-arm64', 'linux',
+        'macos-arm64', 'macos',
+        'windows-arm64', 'windows-x86', 'windows'
+    ]
+    for (def attrib : nativeAttrib) {
+        runtimeOnly "org.lwjgl:lwjgl::natives-$attrib"
+        runtimeOnly "org.lwjgl:lwjgl-jemalloc::natives-$attrib"
+        runtimeOnly "org.lwjgl:lwjgl-glfw::natives-$attrib"
+        runtimeOnly "org.lwjgl:lwjgl-opengl::natives-$attrib"
+        runtimeOnly "org.lwjgl:lwjgl-stb::natives-$attrib"
+    }
+
     compileOnly 'org.jetbrains:annotations:23.0.0'
 }
 

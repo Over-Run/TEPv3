@@ -24,8 +24,6 @@
 
 package org.overrun.tepv3.scene;
 
-import org.jetbrains.annotations.Nullable;
-
 /**
  * <h2>The Scene</h2>
  * In TEPv3, the scene is the most important object. It is the highest-level
@@ -35,10 +33,6 @@ import org.jetbrains.annotations.Nullable;
  * @since 3.0.1
  */
 public class Scene implements IViewport {
-    /**
-     * The current {@link IOverlay overlay}
-     */
-    protected IOverlay overlay;
     /**
      * The {@link Viewport.Mutable viewport}
      */
@@ -72,22 +66,7 @@ public class Scene implements IViewport {
         viewport.setHeight(height);
     }
 
-    /**
-     * Set the current overlay.
-     *
-     * @param overlay The overlay
-     */
-    public void setOverlay(IOverlay overlay) {
-        this.overlay = overlay;
-    }
-
-    /**
-     * Get the current overlay on screen.
-     *
-     * @return The overlay or {@code null} if there's no overlay.
-     */
-    @Nullable
-    public IOverlay getOverlay() {
-        return overlay;
+    public float getAspectRatiof() {
+        return (float) getWidth() / (float) getHeight();
     }
 }
