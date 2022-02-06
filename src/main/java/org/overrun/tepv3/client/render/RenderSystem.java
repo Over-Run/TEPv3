@@ -25,12 +25,14 @@
 package org.overrun.tepv3.client.render;
 
 import org.joml.Matrix4fStack;
+import org.overrun.tepv3.client.gl.GLBlendFunc;
+import org.overrun.tepv3.client.gl.GLDepthFunc;
 import org.overrun.tepv3.client.tex.TextureUtil;
 import org.overrun.tepv3.util.Identifier;
 
 import java.util.Arrays;
 
-import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL14.*;
 
 /**
  * @author squid233
@@ -44,13 +46,15 @@ public class RenderSystem {
     private static final Matrix4fStack modelView =
         new Matrix4fStack(32);
     private static boolean depthTest;
-    private static int depthFunc = GL_LESS;
+    private static GLDepthFunc depthFunc = GLDepthFunc.LESS;
     private static boolean multiSample;
     private static boolean cullFace;
     private static final TextureState[] TEXTURES = new TextureState[32];
     private static int activeTexture;
     private static final int[] shaderTextures = new int[32];
     private static int clearMask;
+    private static boolean blend;
+    private static int blendEquation;
 
     private static class TextureState {
         public boolean isEnabled;
@@ -59,6 +63,55 @@ public class RenderSystem {
 
     static {
         Arrays.fill(TEXTURES, new TextureState());
+    }
+
+    public static void enableBlend() {
+        if (!blend) {
+            blend = true;
+            glEnable(GL_BLEND);
+        }
+    }
+
+    public static void disableBlend() {
+        if (blend) {
+            blend = false;
+            glDisable(GL_BLEND);
+        }
+    }
+
+    public static void blendEquation(int mode) {
+        if (blendEquation != mode) {
+            blendEquation = mode;
+            glBlendEquation(mode);
+        }
+    }
+
+    public static void blendFunc(int srcFactor,
+                                 int dstFactor) {
+        glBlendFunc(srcFactor, dstFactor);
+    }
+
+    public static void blendFuncSeparate(int srcFactorRGB,
+                                         int dstFactorRGB,
+                                         int srcFactorAlpha,
+                                         int dstFactorAlpha) {
+        glBlendFuncSeparate(srcFactorRGB, dstFactorRGB, srcFactorAlpha, dstFactorAlpha);
+    }
+
+    public static void blendFunc(GLBlendFunc srcFactor,
+                                 GLBlendFunc dstFactor) {
+        blendFunc(srcFactor.getValue(),
+            dstFactor.getValue());
+    }
+
+    public static void blendFuncSeparate(GLBlendFunc srcFactorRGB,
+                                         GLBlendFunc dstFactorRGB,
+                                         GLBlendFunc srcFactorAlpha,
+                                         GLBlendFunc dstFactorAlpha) {
+        blendFuncSeparate(srcFactorRGB.getValue(),
+            dstFactorRGB.getValue(),
+            srcFactorAlpha.getValue(),
+            dstFactorAlpha.getValue());
     }
 
     public static void setViewport(int x,
@@ -99,10 +152,10 @@ public class RenderSystem {
         }
     }
 
-    public static void depthFunc(int func) {
+    public static void depthFunc(GLDepthFunc func) {
         if (depthFunc != func) {
             depthFunc = func;
-            glDepthFunc(func);
+            glDepthFunc(func.getValue());
         }
     }
 

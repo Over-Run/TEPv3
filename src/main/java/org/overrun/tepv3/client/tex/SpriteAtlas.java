@@ -24,17 +24,37 @@
 
 package org.overrun.tepv3.client.tex;
 
+import org.overrun.tepv3.client.res.Resource;
+import org.overrun.tepv3.client.res.ResourceType;
 import org.overrun.tepv3.util.Identifier;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @author squid233
  * @since 3.0.1
  */
-public record SpriteAtlas(
-    HashMap<Identifier, Info> infoMap,
-    int width, int height, int glId) {
+public class SpriteAtlas extends Resource {
+    private final HashMap<Identifier, Info> infoMap;
+    private final int width;
+    private final int height;
+    private final int glId;
+
+    public SpriteAtlas(
+        Identifier id,
+        HashMap<Identifier, Info> infoMap,
+        int width, int height, int glId) {
+        super(ResourceType.TEXTURES,
+            id,
+            true,
+            null,
+            null);
+        this.infoMap = infoMap;
+        this.width = width;
+        this.height = height;
+        this.glId = glId;
+    }
 
     public Info getInfo(Identifier id) {
         return infoMap.get(id);
@@ -57,6 +77,52 @@ public record SpriteAtlas(
         var info = getInfo(id);
         return (float) (info.v + info.height) / (float) height;
     }
+
+    public HashMap<Identifier, Info> infoMap() {
+        return infoMap;
+    }
+
+    public int width() {
+        return width;
+    }
+
+    public int height() {
+        return height;
+    }
+
+    public int glId() {
+        return glId;
+    }
+
+    @Override
+    public void close() {
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (SpriteAtlas) obj;
+        return Objects.equals(this.infoMap, that.infoMap) &&
+            this.width == that.width &&
+            this.height == that.height &&
+            this.glId == that.glId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(infoMap, width, height, glId);
+    }
+
+    @Override
+    public String toString() {
+        return "SpriteAtlas[" +
+            "infoMap=" + infoMap + ", " +
+            "width=" + width + ", " +
+            "height=" + height + ", " +
+            "glId=" + glId + ']';
+    }
+
 
     public record Info(Identifier id, int u, int v, int width, int height) {
     }

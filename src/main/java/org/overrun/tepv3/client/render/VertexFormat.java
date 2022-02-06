@@ -25,9 +25,12 @@
 package org.overrun.tepv3.client.render;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL30.*;
@@ -57,9 +60,11 @@ public class VertexFormat {
         size = i;
     }
 
-    @Nullable
+    @NotNull
     public static VertexFormat fromElements(List<VertexFormatElement> elements) {
-        return FORMAT_MAP.get(elements.toString());
+        if (elements == null)
+            return VertexFormats.POSITION;
+        return FORMAT_MAP.getOrDefault(elements.toString(), VertexFormats.POSITION);
     }
 
     @Override

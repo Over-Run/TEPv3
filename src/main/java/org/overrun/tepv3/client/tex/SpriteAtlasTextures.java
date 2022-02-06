@@ -25,6 +25,8 @@
 package org.overrun.tepv3.client.tex;
 
 import org.lwjgl.system.MemoryStack;
+import org.overrun.tepv3.client.res.DefaultResourcePack;
+import org.overrun.tepv3.client.res.IResourceFactory;
 import org.overrun.tepv3.io.FileSystem;
 import org.overrun.tepv3.util.Identifier;
 
@@ -54,26 +56,27 @@ public class SpriteAtlasTextures {
 
     public static void generateAtlases() {
         var blockAtlas = generateBlockAtlas();
-        TextureUtil.putTexture(BLOCK_ATLAS, blockAtlas.glId());
+        DefaultResourcePack.putResource(BLOCK_ATLAS, blockAtlas);
         ATLASES.put(BLOCK_ATLAS, blockAtlas);
     }
 
     private static SpriteAtlas generateBlockAtlas() {
         Identifier[] blocks = {
-            new Identifier("bedrock"),
-            new Identifier("cobblestone"),
-            new Identifier("dirt"),
-            new Identifier("grass_block_side"),
-            new Identifier("grass_block_side_overlay"),
-            new Identifier("grass_block_top"),
-            new Identifier("stone")};//todo collect models and replace
+            new Identifier("block/bedrock"),
+            new Identifier("block/cobblestone"),
+            new Identifier("block/dirt"),
+            new Identifier("block/grass_block_side"),
+            new Identifier("block/grass_block_side_overlay"),
+            new Identifier("block/grass_block_top"),
+            new Identifier("block/stone")};//todo collect models and replace
         var images = new HashMap<Identifier, NativeImage>(blocks.length);
         try (var stack = MemoryStack.stackPush()) {
             var xp = stack.mallocInt(1);
             var yp = stack.mallocInt(1);
             var cp = stack.mallocInt(1);
             for (var id : blocks) {
-                var path = "assets/" + id.getNamespace() + "/textures/block/" + id.getPath() + ".png";
+                var path = IResourceFactory.toPath(id.getNamespace(),
+                    "textures/" + id.getPath() + ".png");
                 try (var is = FileSystem.CLASS.findResource(
                     path,
                     TextureStitcher.class)) {
@@ -100,6 +103,6 @@ public class SpriteAtlasTextures {
                 }
             }
         }
-        return TextureStitcher.generateAtlas(images);
+        return TextureStitcher.generateAtlas(BLOCK_ATLAS, images);
     }
 }

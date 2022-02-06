@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 /**
- * The buffered implementation of {@link IVertexBuilder}.
+ * The buffered implementation of {@link IVertexBuilder}. TODO: Color to ubyte
  *
  * @author squid233
  * @since 3.0.1

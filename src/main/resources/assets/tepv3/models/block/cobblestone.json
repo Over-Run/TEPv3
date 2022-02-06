@@ -1,0 +1,6 @@
+{
+  "parent": "tepv3:block/cube_all",
+  "defines": {
+    "texture": "tepv3:block/cobblestone"
+  }
+}

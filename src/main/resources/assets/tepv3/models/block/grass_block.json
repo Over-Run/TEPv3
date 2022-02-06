@@ -1,0 +1,12 @@
+{
+  "parent": "tepv3:block/cube",
+  "defines": {
+    "west": "#texture",
+    "east": "#texture",
+    "down": "tepv3:block/dirt",
+    "up": "tepv3:block/grass_block_top",
+    "north": "#texture",
+    "south": "#texture",
+    "texture": "grass_block_side"
+  }
+}

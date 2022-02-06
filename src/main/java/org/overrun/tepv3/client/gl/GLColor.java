@@ -24,20 +24,16 @@
 
 package org.overrun.tepv3.client.gl;
 
-import static org.lwjgl.opengl.GL11.*;
-
 /**
  * @author squid233
  * @since 3.0.1
  */
-public class DepthFunc {
-    public static final int
-        NEVER    = GL_NEVER,
-        LESS     = GL_LESS,
-        EQUAL    = GL_EQUAL,
-        LEQUAL   = GL_LEQUAL,
-        GREATER  = GL_GREATER,
-        NOTEQUAL = GL_NOTEQUAL,
-        GEQUAL   = GL_GEQUAL,
-        ALWAYS   = GL_ALWAYS;
+public class GLColor {
+    public static int toUbyte(float color) {
+        if (color < 0.0f)
+            return 0;
+        else if (color > 1.0f)
+            return 255;
+        return (int) (color * 255) & 0xFF;
+    }
 }

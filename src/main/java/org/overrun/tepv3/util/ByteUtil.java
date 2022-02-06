@@ -22,30 +22,31 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
+package org.overrun.tepv3.util;
 
-import org.overrun.tepv3.client.gl.VertexBuilder;
-import org.overrun.tepv3.client.render.RenderSystem;
-import org.overrun.tepv3.client.render.VertexFormat;
-
-import java.nio.ByteBuffer;
+import it.unimi.dsi.fastutil.bytes.ByteList;
 
 /**
- * <h2>The mesh</h2>
- * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
- * built model. You can use the mesh if you don't need to draw the scene
- * dynamically.
- *
  * @author squid233
  * @since 3.0.1
  */
-public interface IMesh {
-    /**
-     * Use current {@link RenderSystem} states to render.
-     */
-    void render();
+public class ByteUtil {
+    public static <T extends ByteList> T putFloat(T list,
+                                                  float f) {
+        int bits = Float.floatToRawIntBits(f);
+        list.add((byte) (bits >> 24));
+        list.add((byte) (bits >> 16));
+        list.add((byte) (bits >> 8));
+        list.add((byte) bits);
+        return list;
+    }
 
-    ByteBuffer getRawData();
+    public static <T extends ByteList> T putFloats(T list,
+                                                   float... fs) {
+        for (var f : fs) {
+            putFloat(list, f);
+        }
+        return list;
+    }
 
-    VertexFormat getFormat();
 }

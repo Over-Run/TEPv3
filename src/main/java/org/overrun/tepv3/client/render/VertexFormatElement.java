@@ -193,7 +193,9 @@ public class VertexFormatElement {
         private final String name;
         private final int id;
 
-        DataType(int byteCount, String name, int id) {
+        DataType(int byteCount,
+                 String name,
+                 int id) {
             this.byteLength = byteCount;
             this.name = name;
             this.id = id;

@@ -35,7 +35,7 @@ import static org.overrun.tepv3.client.render.VertexFormatElement.Type.*;
  */
 public class VertexFormats {
     public static final VertexFormatElement POSITION_ELEMENT = new VertexFormatElement(0, FLOAT, VertexFormatElement.Type.POSITION, 3);
-    public static final VertexFormatElement COLOR_ELEMENT = new VertexFormatElement(0, FLOAT, COLOR, 4);
+    public static final VertexFormatElement COLOR_ELEMENT = new VertexFormatElement(0, UBYTE, COLOR, 4);
     public static final VertexFormatElement TEXTURE_0_ELEMENT = new VertexFormatElement(0, FLOAT, UV, 2);
     public static final VertexFormatElement OVERLAY_ELEMENT = new VertexFormatElement(1, SHORT, UV, 2);
     public static final VertexFormatElement LIGHT_ELEMENT = new VertexFormatElement(2, SHORT, UV, 2);

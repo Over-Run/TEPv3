@@ -22,30 +22,23 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
+package org.overrun.tepv3.client.res;
 
-import org.overrun.tepv3.client.gl.VertexBuilder;
-import org.overrun.tepv3.client.render.RenderSystem;
-import org.overrun.tepv3.client.render.VertexFormat;
-
-import java.nio.ByteBuffer;
+import org.overrun.tepv3.util.Identifier;
 
 /**
- * <h2>The mesh</h2>
- * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
- * built model. You can use the mesh if you don't need to draw the scene
- * dynamically.
- *
  * @author squid233
  * @since 3.0.1
  */
-public interface IMesh {
-    /**
-     * Use current {@link RenderSystem} states to render.
-     */
-    void render();
+@FunctionalInterface
+public interface IResourceFactory {
+    static String toPath(String namespace, String path) {
+        return "assets/" + namespace + "/" + path;
+    }
 
-    ByteBuffer getRawData();
+    static String toPath(Identifier id) {
+        return toPath(id.getNamespace(), id.getPath());
+    }
 
-    VertexFormat getFormat();
+    Resource getResource(Identifier id);
 }

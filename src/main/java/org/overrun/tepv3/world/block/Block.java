@@ -95,6 +95,7 @@ public class Block extends AbstractBlock {
         return Registries.BLOCK.getId(this);
     }
 
+    @Deprecated
     public void renderFace(Mesh.Builder builder, int x, int y, int z, Direction face) {
         var tex = getTexture(face);
         var u0 = getAtlas(BLOCK_ATLAS).getU0(tex);

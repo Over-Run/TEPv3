@@ -25,11 +25,9 @@
 package org.overrun.tepv3.client.render;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.overrun.tepv3.client.gl.GLUniform;
-import org.overrun.tepv3.client.gl.IGLProgram;
-import org.overrun.tepv3.client.gl.Shader;
-import org.overrun.tepv3.client.gl.Uniform;
+import org.overrun.tepv3.client.gl.*;
 import org.overrun.tepv3.io.FileSystem;
 import org.overrun.tepv3.util.BuiltinResources;
 import org.overrun.tepv3.util.Identifier;
@@ -37,7 +35,9 @@ import org.overrun.tepv3.util.Identifier;
 import java.io.IOException;
 import java.util.*;
 
-import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.*;
+import static org.overrun.tepv3.client.gl.GLBlendState.getCompFromStr;
+import static org.overrun.tepv3.client.gl.GLBlendState.getFuncFromStr;
 import static org.overrun.tepv3.client.gl.GLProgramMgr.*;
 import static org.overrun.tepv3.util.JsonHelper.*;
 
@@ -59,6 +59,7 @@ public class Program implements IGLProgram, AutoCloseable {
     private final int programId;
     private final String name;
     private boolean isDirty;
+    public final GLBlendState blendState;
     private final IntArrayList loadedAttributeIds;
     private final List<String> attributeNames;
     private final Shader vertexShader;
@@ -105,6 +106,7 @@ public class Program implements IGLProgram, AutoCloseable {
                 }
             }
 
+            blendState = readBlendState(getObject(obj, "blend", null));
             vertexShader = loadShader(Shader.Type.VERTEX, getString(obj, "vertex"));
             fragmentShader = loadShader(Shader.Type.FRAGMENT, getString(obj, "fragment"));
             programId = createProgram();
@@ -139,9 +141,45 @@ public class Program implements IGLProgram, AutoCloseable {
             return shader;
     }
 
+    public static GLBlendState readBlendState(JsonObject json) {
+        if (json == null)
+            return new GLBlendState();
+        int func = GL_FUNC_ADD;
+        int srcRgb = GL_ONE;
+        int dstRgb = GL_ZERO;
+        int srcAlpha = GL_ONE;
+        int dstAlpha = GL_ZERO;
+        var blendDisabled = true;
+        var separateBlend = false;
+        if (hasString(json, "func") && (func = getFuncFromStr(json.get("func").getAsString())) != GL_FUNC_ADD)
+            blendDisabled = false;
+        if (hasString(json, "src_rgb") && (srcRgb = getCompFromStr(json.get("src_rgb").getAsString())) != GL_ONE)
+            blendDisabled = false;
+        if (hasString(json, "dst_rgb") && (dstRgb = getCompFromStr(json.get("dst_rgb").getAsString())) != GL_ZERO)
+            blendDisabled = false;
+        if (hasString(json, "src_alpha")) {
+            srcAlpha = getCompFromStr(json.get("src_alpha").getAsString());
+            if (srcAlpha != 1)
+                blendDisabled = false;
+            separateBlend = true;
+        }
+        if (hasString(json, "dst_alpha")) {
+            dstAlpha = getCompFromStr(json.get("dst_alpha").getAsString());
+            if (dstAlpha != 0)
+                blendDisabled = false;
+            separateBlend = true;
+        }
+        if (blendDisabled)
+            return new GLBlendState();
+        if (separateBlend)
+            return new GLBlendState(srcRgb, dstRgb, srcAlpha, dstAlpha, func);
+        return new GLBlendState(srcRgb, dstRgb, func);
+    }
+
     public void bind() {
         isDirty = false;
         activeProgram = this;
+        blendState.enable();
         if (programId != activeProgramId) {
             useProgram(programId);
             activeProgramId = programId;

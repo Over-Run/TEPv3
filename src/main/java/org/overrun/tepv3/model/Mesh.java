@@ -24,8 +24,6 @@
 
 package org.overrun.tepv3.model;
 
-import it.unimi.dsi.fastutil.floats.FloatArrayList;
-import it.unimi.dsi.fastutil.floats.FloatList;
 import org.overrun.tepv3.client.gl.IVertexBuilder;
 import org.overrun.tepv3.client.render.RenderSystem;
 import org.overrun.tepv3.client.render.VertexFormat;
@@ -33,29 +31,34 @@ import org.overrun.tepv3.client.render.VertexFormatElement;
 import org.overrun.tepv3.client.render.VertexFormatElement.Type;
 import org.overrun.tepv3.client.render.VertexFormats;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.system.MemoryUtil.*;
+import static org.overrun.tepv3.client.gl.GLColor.toUbyte;
 
 /**
  * @author squid233
  * @since 3.0.1
  */
 public class Mesh implements IMesh {
-    private final float[] rawData;
+    private final ByteBuffer rawData;
     private final VertexFormat format;
     private final int vertexCount;
     private boolean built;
     private int vao, vbo;
 
     public static class Builder implements IVertexBuilder {
-        private final FloatList data = new FloatArrayList();
+        private int dataSz = 0x30000;
+        private int buf0Sz = 0x18;
+        private ByteBuffer data = memAlloc(dataSz);
         private boolean quad;
         private boolean hasColor, hasTexture;
         private float x, y, z, r, g, b, a, u, v;
         private int vertexCount;
         private int vertexIndex;
-        private FloatList buf0;
+        private ByteBuffer buf0 = memAlloc(buf0Sz);
 
         /**
          * Enable quad building.
@@ -138,57 +141,63 @@ public class Mesh implements IMesh {
                          float a,
                          float u,
                          float v) {
-            data.add(x);
-            data.add(y);
-            data.add(z);
+            if (data.capacity() - data.position() < 32) {
+                dataSz += 0x30000;
+                data = memRealloc(data, dataSz);
+            }
+            data.putFloat(x)
+                .putFloat(y)
+                .putFloat(z);
             if (hasColor) {
-                data.add(r);
-                data.add(g);
-                data.add(b);
-                data.add(a);
+                data.put((byte) toUbyte(r))
+                    .put((byte) toUbyte(g))
+                    .put((byte) toUbyte(b))
+                    .put((byte) toUbyte(a));
             }
             if (hasTexture) {
-                data.add(u);
-                data.add(v);
+                data.putFloat(u)
+                    .putFloat(v);
             }
             ++vertexCount;
             if (quad) {
-                if (buf0 == null)
-                    buf0 = new FloatArrayList();
+                if (buf0.capacity() - buf0.position() < 32) {
+                    buf0Sz += 0x18;
+                    buf0 = memRealloc(buf0, buf0Sz);
+                }
                 if (vertexIndex == 0) {
-                    buf0.add(x);
-                    buf0.add(y);
-                    buf0.add(z);
+                    buf0.putFloat(x)
+                        .putFloat(y)
+                        .putFloat(z);
                     if (hasColor) {
-                        buf0.add(r);
-                        buf0.add(g);
-                        buf0.add(b);
-                        buf0.add(a);
+                        buf0.put((byte) toUbyte(r))
+                            .put((byte) toUbyte(g))
+                            .put((byte) toUbyte(b))
+                            .put((byte) toUbyte(a));
                     }
                     if (hasTexture) {
-                        buf0.add(u);
-                        buf0.add(v);
+                        buf0.putFloat(u)
+                            .putFloat(v);
                     }
                 } else if (vertexIndex == 2) {
-                    data.add(x);
-                    data.add(y);
-                    data.add(z);
+                    data.putFloat(x)
+                        .putFloat(y)
+                        .putFloat(z);
                     if (hasColor) {
-                        data.add(r);
-                        data.add(g);
-                        data.add(b);
-                        data.add(a);
+                        data.put((byte) toUbyte(r))
+                            .put((byte) toUbyte(g))
+                            .put((byte) toUbyte(b))
+                            .put((byte) toUbyte(a));
                     }
                     if (hasTexture) {
-                        data.add(u);
-                        data.add(v);
+                        data.putFloat(u)
+                            .putFloat(v);
                     }
                 }
                 ++vertexIndex;
 
                 if (vertexIndex == 4) {
                     vertexIndex = 0;
-                    data.addAll(buf0);
+                    data.put(buf0.flip());
                     buf0.clear();
                     vertexCount += 2;
                 }
@@ -201,19 +210,21 @@ public class Mesh implements IMesh {
         }
 
         public Mesh build() {
-            var fmt = new ArrayList<VertexFormatElement>();
-            fmt.add(VertexFormats.POSITION_ELEMENT);
+            var fmtList = new ArrayList<VertexFormatElement>();
+            fmtList.add(VertexFormats.POSITION_ELEMENT);
             if (hasColor)
-                fmt.add(VertexFormats.COLOR_ELEMENT);
+                fmtList.add(VertexFormats.COLOR_ELEMENT);
             if (hasTexture)
-                fmt.add(VertexFormats.TEXTURE_0_ELEMENT);
-            return new Mesh(data.toFloatArray(),
-                VertexFormat.fromElements(fmt),
+                fmtList.add(VertexFormats.TEXTURE_0_ELEMENT);
+            var fmt = VertexFormat.fromElements(fmtList);
+            memFree(buf0);
+            return new Mesh(data.flip(),
+                fmt,
                 vertexCount);
         }
     }
 
-    public Mesh(float[] rawData,
+    public Mesh(ByteBuffer rawData,
                 VertexFormat format,
                 int vertexCount) {
         this.rawData = rawData;
@@ -224,7 +235,6 @@ public class Mesh implements IMesh {
     @Override
     public void render() {
         var shader = RenderSystem.getProgram();
-        shader.addSampler("Sampler0", RenderSystem.getShaderTexture(0));
         if (shader.projMat != null) {
             shader.projMat.set(RenderSystem.getProjection());
         }
@@ -253,7 +263,7 @@ public class Mesh implements IMesh {
     }
 
     @Override
-    public float[] getRawData() {
+    public ByteBuffer getRawData() {
         return rawData;
     }
 
@@ -263,6 +273,7 @@ public class Mesh implements IMesh {
     }
 
     public void free() {
+        memFree(rawData);
         if (glIsVertexArray(vao)) {
             glDeleteVertexArrays(vao);
             vao = 0;

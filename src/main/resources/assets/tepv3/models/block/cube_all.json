@@ -1,0 +1,11 @@
+{
+  "parent": "tepv3:block/cube",
+  "defines": {
+    "west": "#texture",
+    "east": "#texture",
+    "down": "#texture",
+    "up": "#texture",
+    "north": "#texture",
+    "south": "#texture"
+  }
+}

@@ -26,12 +26,15 @@ package org.overrun.tepv3.client;
 
 import org.joml.Vector3d;
 import org.lwjgl.opengl.GLUtil;
-import org.overrun.tepv3.client.gl.DepthFunc;
+import org.overrun.tepv3.client.gl.GLBlendFunc;
+import org.overrun.tepv3.client.gl.GLBlendState;
+import org.overrun.tepv3.client.gl.GLDepthFunc;
 import org.overrun.tepv3.client.render.Frustum;
 import org.overrun.tepv3.client.render.GameRenderer;
 import org.overrun.tepv3.client.render.RenderSystem;
 import org.overrun.tepv3.client.tex.SpriteAtlasTextures;
 import org.overrun.tepv3.client.world.render.WorldRenderer;
+import org.overrun.tepv3.model.Mesh;
 import org.overrun.tepv3.scene.GLFWScene;
 import org.overrun.tepv3.util.registry.Registries;
 import org.overrun.tepv3.world.World;
@@ -58,6 +61,7 @@ public class TEPv3Game extends GLFWScene {
     public WorldRenderer worldRenderer;
     public PlayerEntity player;// todo player into world
     public Camera attachCamera;
+    public Mesh crossHair;
 
     public TEPv3Game() {
         super(INIT_WIDTH, INIT_HEIGHT, INIT_TITLE);
@@ -122,9 +126,9 @@ public class TEPv3Game extends GLFWScene {
             getWindow().setPos((vidMode.width() - viewport.getWidth()) / 2,
                 (vidMode.height() - viewport.getHeight()) / 2);
         getWindow().setRawMouseMotion(true);
-        RenderSystem.setClearColor(0.4f, 0.6f, 0.9f, 1.0f);
+        RenderSystem.setClearColor(0.4f, 0.6f, 0.9f, 1);
         RenderSystem.enableDepthTest();
-        RenderSystem.depthFunc(DepthFunc.LEQUAL);
+        RenderSystem.depthFunc(GLDepthFunc.LEQUAL);
         if (ENABLE_MULTI_SAMPLE) {
             RenderSystem.enableMultiSample();
         }
@@ -139,6 +143,16 @@ public class TEPv3Game extends GLFWScene {
         worldRenderer = new WorldRenderer(world);
         player = new PlayerEntity(world);
         attachCamera = player.camera;
+        var builder = new Mesh.Builder().enableQuad();
+        builder.color(1, 1, 1, 0.5f).vertex(2, -8, 0).next();
+        builder.color(1, 1, 1, 0.5f).vertex(0, -8, 0).next();
+        builder.color(1, 1, 1, 0.5f).vertex(0, 10, 0).next();
+        builder.color(1, 1, 1, 0.5f).vertex(2, 10, 0).next();
+        builder.color(1, 1, 1, 0.5f).vertex(10, 0, 0).next();
+        builder.color(1, 1, 1, 0.5f).vertex(-8, 0, 0).next();
+        builder.color(1, 1, 1, 0.5f).vertex(-8, 2, 0).next();
+        builder.color(1, 1, 1, 0.5f).vertex(10, 2, 0).next();
+        crossHair = builder.build();
 
         SpriteAtlasTextures.generateAtlases();
     }
@@ -179,7 +193,6 @@ public class TEPv3Game extends GLFWScene {
         RenderSystem.clear();
         setupCamera(delta);
         RenderSystem.enableCullFace();
-        RenderSystem.setProgram(GameRenderer.getPositionColorTexProgram());
         RenderSystem.setProgramColor(1, 1, 1, 1);
         var frustum = Frustum.getFrustum();
         worldRenderer.updateDirtyChunks(player);
@@ -193,6 +206,17 @@ public class TEPv3Game extends GLFWScene {
     private void drawGui() {
         RenderSystem.clearDepthBuf();
         RenderSystem.clear();
+        RenderSystem.getProjection().setOrtho(0, viewport.getWidth(), viewport.getHeight(), 0, -1, 1);
+        RenderSystem.getModelView().translation(viewport.getWidth() / 2.0f,
+            viewport.getHeight() / 2.0f,
+            0.0f);
+        RenderSystem.setProgram(GameRenderer.getPositionColorProgram());
+        RenderSystem.blendFuncSeparate(GLBlendFunc.ONE_MINUS_DST_COLOR,
+            GLBlendFunc.ONE_MINUS_SRC_COLOR,
+            GLBlendFunc.ONE,
+            GLBlendFunc.ZERO);
+        crossHair.render();
+        GLBlendState.activeBlendState = null;
     }
 
     @Override

@@ -22,30 +22,49 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
+package org.overrun.tepv3.client.res;
 
-import org.overrun.tepv3.client.gl.VertexBuilder;
-import org.overrun.tepv3.client.render.RenderSystem;
-import org.overrun.tepv3.client.render.VertexFormat;
+import org.overrun.tepv3.util.Identifier;
 
-import java.nio.ByteBuffer;
+import java.util.function.Predicate;
 
 /**
- * <h2>The mesh</h2>
- * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
- * built model. You can use the mesh if you don't need to draw the scene
- * dynamically.
+ * The resource types.
+ * <p>
+ * Currently available types are in the code.
+ * </p>
  *
  * @author squid233
  * @since 3.0.1
  */
-public interface IMesh {
+public enum ResourceType {
+    MODELS("models/", s -> s.endsWith(".json")),
+    SHADERS("shaders/", s -> s.endsWith(".json")),
+    TEXTURES("textures/", s -> s.endsWith(".png"));
+
+    private final String directory;
+    private final Predicate<String> checker;
+
+    ResourceType(String directory,
+                 Predicate<String> checker) {
+        this.directory = directory;
+        this.checker = checker;
+    }
+
     /**
-     * Use current {@link RenderSystem} states to render.
+     * Get the directory.
+     *
+     * @return The directory ends with "/".
      */
-    void render();
+    public String getDirectory() {
+        return directory;
+    }
 
-    ByteBuffer getRawData();
+    public boolean isSameAs(String s) {
+        return s.contains(getDirectory()) || checker.test(s);
+    }
 
-    VertexFormat getFormat();
+    public boolean isSameAs(Identifier id) {
+        return isSameAs(id.getPath());
+    }
 }

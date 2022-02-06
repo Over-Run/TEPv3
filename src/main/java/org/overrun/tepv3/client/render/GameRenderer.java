@@ -37,6 +37,9 @@ import java.util.Map;
 public class GameRenderer implements AutoCloseable {
     private final TEPv3Game client;
     private final Map<String, Program> programs = new HashMap<>();
+    public Program blitScreenProgram;
+    //@Nullable
+    //private static Program positionProgram;
     @Nullable
     private static Program positionColorProgram;
     @Nullable
@@ -49,6 +52,10 @@ public class GameRenderer implements AutoCloseable {
     }
 
     public void preloadPrograms() {
+        if (blitScreenProgram != null)
+            throw new RuntimeException("Blit shader already preloaded");
+        blitScreenProgram = new Program("blit_screen", VertexFormats.BLIT_SCREEN);
+        //positionProgram = loadProgram("position", VertexFormats.POSITION);
         positionColorProgram = loadProgram("position_color", VertexFormats.POSITION_COLOR);
         positionColorTexProgram = loadProgram("position_color_tex", VertexFormats.POSITION_COLOR_TEXTURE);
         positionTexProgram = loadProgram("position_tex", VertexFormats.POSITION_TEXTURE);
@@ -79,7 +86,14 @@ public class GameRenderer implements AutoCloseable {
     @Override
     public void close() {
         clearPrograms();
+        if (blitScreenProgram != null)
+            blitScreenProgram.close();
     }
+
+    //@Nullable
+    //public static Program getPositionProgram() {
+    //    return positionProgram;
+    //}
 
     @Nullable
     public static Program getPositionColorProgram() {

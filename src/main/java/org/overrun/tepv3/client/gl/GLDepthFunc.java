@@ -22,30 +22,31 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
+package org.overrun.tepv3.client.gl;
 
-import org.overrun.tepv3.client.gl.VertexBuilder;
-import org.overrun.tepv3.client.render.RenderSystem;
-import org.overrun.tepv3.client.render.VertexFormat;
-
-import java.nio.ByteBuffer;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
- * <h2>The mesh</h2>
- * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
- * built model. You can use the mesh if you don't need to draw the scene
- * dynamically.
- *
  * @author squid233
  * @since 3.0.1
  */
-public interface IMesh {
-    /**
-     * Use current {@link RenderSystem} states to render.
-     */
-    void render();
+public enum GLDepthFunc {
+    NEVER(GL_NEVER),
+    LESS(GL_LESS),
+    EQUAL(GL_EQUAL),
+    LEQUAL(GL_LEQUAL),
+    GREATER(GL_GREATER),
+    NOTEQUAL(GL_NOTEQUAL),
+    GEQUAL(GL_GEQUAL),
+    ALWAYS(GL_ALWAYS);
 
-    ByteBuffer getRawData();
+    private final int func;
 
-    VertexFormat getFormat();
+    GLDepthFunc(int func) {
+        this.func = func;
+    }
+
+    public int getValue() {
+        return func;
+    }
 }
