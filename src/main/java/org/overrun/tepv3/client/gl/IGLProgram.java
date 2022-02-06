@@ -22,28 +22,20 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
-
-import org.overrun.tepv3.client.gl.VertexBuilder;
-import org.overrun.tepv3.client.render.RenderSystem;
-import org.overrun.tepv3.client.render.VertexFormat;
+package org.overrun.tepv3.client.gl;
 
 /**
- * <h2>The mesh</h2>
- * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
- * built model. You can use the mesh if you don't need to draw the scene
- * dynamically.
- *
  * @author squid233
  * @since 3.0.1
  */
-public interface IMesh {
-    /**
-     * Use current {@link RenderSystem} states to render.
-     */
-    void render();
+public interface IGLProgram {
+    int getProgramId();
 
-    float[] getRawData();
+    void markUniformsDirty();
 
-    VertexFormat getFormat();
+    Shader getVertexShader();
+
+    Shader getFragmentShader();
+
+    void attachReferencedShaders();
 }

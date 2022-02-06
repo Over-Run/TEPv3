@@ -25,7 +25,7 @@
 package org.overrun.tepv3.util;
 
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -39,9 +39,8 @@ public class BuiltinResources {
     private static final ClassLoader LOADER =
         BuiltinResources.class.getClassLoader();
 
-    public static String getContent(String filename) {
-        try (var is = LOADER.getResourceAsStream(filename);
-             var isr = new InputStreamReader(requireNonNull(is), UTF_8);
+    public static String getContent(InputStream stream, String name) {
+        try (var isr = new InputStreamReader(requireNonNull(stream), UTF_8);
              var br = new BufferedReader(isr)) {
             var ln = br.readLine();
             var sb = new StringBuilder(ln);
@@ -50,7 +49,15 @@ public class BuiltinResources {
             }
             return sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Can't find resource {" + filename + "}", e);
+            throw new RuntimeException("Can't find resource {" + name + "}", e);
+        }
+    }
+
+    public static String getContent(String filename) {
+        try (var is = LOADER.getResourceAsStream(filename)) {
+            return getContent(is, filename);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

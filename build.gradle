@@ -30,7 +30,8 @@ dependencies {
     api 'org.lwjgl:lwjgl-opengl'
     api 'org.lwjgl:lwjgl-stb'
     api 'org.joml:joml:1.10.3'
-    api 'io.github.over-run:common-utils:0.3.0'
+    api 'it.unimi.dsi:fastutil:8.5.6'
+    api 'com.google.code.gson:gson:2.8.9'
 
     def nativeAttrib = [
         'linux-arm32', 'linux-arm64', 'linux',

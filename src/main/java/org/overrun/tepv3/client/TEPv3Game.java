@@ -26,10 +26,12 @@ package org.overrun.tepv3.client;
 
 import org.joml.Vector3d;
 import org.lwjgl.opengl.GLUtil;
+import org.overrun.tepv3.client.gl.DepthFunc;
+import org.overrun.tepv3.client.render.Frustum;
+import org.overrun.tepv3.client.render.GameRenderer;
+import org.overrun.tepv3.client.render.RenderSystem;
 import org.overrun.tepv3.client.tex.SpriteAtlasTextures;
 import org.overrun.tepv3.client.world.render.WorldRenderer;
-import org.overrun.tepv3.gl.RenderSystem;
-import org.overrun.tepv3.gl.ShaderProgram;
 import org.overrun.tepv3.scene.GLFWScene;
 import org.overrun.tepv3.util.registry.Registries;
 import org.overrun.tepv3.world.World;
@@ -37,7 +39,7 @@ import org.overrun.tepv3.world.entity.PlayerEntity;
 
 import static java.lang.Math.toRadians;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.Configuration.*;
 import static org.overrun.tepv3.client.RunArgs.*;
 
 /**
@@ -45,10 +47,13 @@ import static org.overrun.tepv3.client.RunArgs.*;
  * @since 3.0.1
  */
 public class TEPv3Game extends GLFWScene {
+    private static final boolean _DEBUG = false; // Change it on production
+    private static final boolean ENABLE_MULTI_SAMPLE = false;
     public static final double SENSITIVITY = 0.15;
     private static TEPv3Game instance;
     private boolean isFirstMouse = true;
     private boolean isPausing = true;
+    public GameRenderer gameRenderer;
     public World world;
     public WorldRenderer worldRenderer;
     public PlayerEntity player;// todo player into world
@@ -56,6 +61,27 @@ public class TEPv3Game extends GLFWScene {
 
     public TEPv3Game() {
         super(INIT_WIDTH, INIT_HEIGHT, INIT_TITLE);
+    }
+
+    @Override
+    public void onStarting() {
+        if (_DEBUG) { //#ifdef _DEBUG
+            DEBUG.set(true);
+            DEBUG_LOADER.set(true);
+            DEBUG_MEMORY_ALLOCATOR.set(true);
+            DEBUG_STACK.set(true);
+            DEBUG_FUNCTIONS.set(true);
+        }
+    }
+
+    @Override
+    public void setWindowHints() {
+        if (_DEBUG) { //#ifdef _DEBUG
+            glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
+        }
+        if (ENABLE_MULTI_SAMPLE) {
+            glfwWindowHint(GLFW_SAMPLES, 2);
+        }
     }
 
     @Override
@@ -87,21 +113,28 @@ public class TEPv3Game extends GLFWScene {
 
     @Override
     public void init() {
+        if (_DEBUG) { //#ifdef _DEBUG
+            GLUtil.setupDebugMessageCallback(System.err);
+        }
+
         final var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vidMode != null)
             getWindow().setPos((vidMode.width() - viewport.getWidth()) / 2,
                 (vidMode.height() - viewport.getHeight()) / 2);
         getWindow().setRawMouseMotion(true);
-        glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
+        RenderSystem.setClearColor(0.4f, 0.6f, 0.9f, 1.0f);
         RenderSystem.enableDepthTest();
-        RenderSystem.depthFunc(GL_LEQUAL);
-        if (false) //#ifdef _DEBUG
-            GLUtil.setupDebugMessageCallback(System.err);
+        RenderSystem.depthFunc(DepthFunc.LEQUAL);
+        if (ENABLE_MULTI_SAMPLE) {
+            RenderSystem.enableMultiSample();
+        }
 
         Registries.load();
 
         timer.timeScale = 0;
 
+        gameRenderer = new GameRenderer(this);
+        gameRenderer.preloadPrograms();
         world = new World(System.nanoTime(), 256, 64, 256);
         worldRenderer = new WorldRenderer(world);
         player = new PlayerEntity(world);
@@ -141,25 +174,35 @@ public class TEPv3Game extends GLFWScene {
 
     @Override
     public void render(double delta) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        RenderSystem.clearColorBuf();
+        RenderSystem.clearDepthBuf();
+        RenderSystem.clear();
         setupCamera(delta);
         RenderSystem.enableCullFace();
-        RenderSystem.useShader(ShaderProgram.POSITION_COLOR_TEX);
-        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.setProgram(GameRenderer.getPositionColorTexProgram());
+        RenderSystem.setProgramColor(1, 1, 1, 1);
         var frustum = Frustum.getFrustum();
         worldRenderer.updateDirtyChunks(player);
         worldRenderer.render(0);
         //todo setup fog and light
         worldRenderer.render(1);
+
+        drawGui();
+    }
+
+    private void drawGui() {
+        RenderSystem.clearDepthBuf();
+        RenderSystem.clear();
     }
 
     @Override
     public void resize(int width, int height) {
-        glViewport(0, 0, width, height);
+        RenderSystem.setViewport(0, 0, width, height);
     }
 
     @Override
     public void onExiting() {
+        gameRenderer.close();
         worldRenderer.free();
     }
 

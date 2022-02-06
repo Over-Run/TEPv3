@@ -22,7 +22,9 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.gl;
+package org.overrun.tepv3.client.gl;
+
+import org.overrun.tepv3.client.render.VertexFormat;
 
 /**
  * @author squid233
@@ -72,10 +74,10 @@ public interface IVertexBuilder {
     /**
      * Push an array.
      *
-     * @param layout  The layout
+     * @param format  The format
      * @param rawData The data
      */
-    void array(VertexLayout layout, float[] rawData);
+    void array(VertexFormat format, float[] rawData);
 
     void next(float x,
               float y,

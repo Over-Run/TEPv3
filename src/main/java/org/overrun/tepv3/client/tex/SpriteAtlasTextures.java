@@ -54,7 +54,7 @@ public class SpriteAtlasTextures {
 
     public static void generateAtlases() {
         var blockAtlas = generateBlockAtlas();
-        TextureMgr.putTexture(BLOCK_ATLAS, blockAtlas.glId());
+        TextureUtil.putTexture(BLOCK_ATLAS, blockAtlas.glId());
         ATLASES.put(BLOCK_ATLAS, blockAtlas);
     }
 

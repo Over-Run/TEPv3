@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.client;
+package org.overrun.tepv3.client.render;
 
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
-import org.overrun.tepv3.gl.RenderSystem;
 import org.overrun.tepv3.phys.AABBox;
 
 /**

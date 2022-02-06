@@ -26,8 +26,7 @@ package org.overrun.tepv3.scene;
 
 import org.lwjgl.opengl.GL;
 import org.overrun.tepv3.Window;
-import org.overrun.tepv3.gl.ShaderProgram;
-import org.overrun.tepv3.gl.VertexBuilder;
+import org.overrun.tepv3.client.gl.VertexBuilder;
 import org.overrun.tepv3.util.Timer;
 
 import static java.lang.Math.floor;
@@ -122,7 +121,6 @@ public class GLFWScene extends Scene implements Runnable {
         glfwSwapInterval(swapInterval);
         GL.createCapabilities(true);
         resize(getWidth(), getHeight());
-        ShaderProgram.initialize();
         init();
         window.show();
         run();
@@ -144,9 +142,9 @@ public class GLFWScene extends Scene implements Runnable {
     }
 
     public final void exit() {
-        onExiting();
         VertexBuilder.freeResources();
-        ShaderProgram.freeResources();
+        onExiting();
+        GL.setCapabilities(null);
         window.freeCallbacks();
         window.destroy();
         glfwTerminate();

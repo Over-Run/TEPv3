@@ -36,6 +36,8 @@ import static org.lwjgl.opengl.GL30.*;
  * @since 3.0.1
  */
 public class TextureStitcher {
+    public static final int MIPMAP_LEVEL = 4;
+
     public static SpriteAtlas generateAtlas(Map<Identifier, NativeImage> images) {
         var values = images.values().toArray(new NativeImage[0]);
         var blocks = new Block[values.length];
@@ -51,6 +53,12 @@ public class TextureStitcher {
         glBindTexture(GL_TEXTURE_2D, id);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, MIPMAP_LEVEL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, GL_ZERO);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, MIPMAP_LEVEL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, GL_ZERO);
         glTexImage2D(GL_TEXTURE_2D,
             0,
             GL_RGBA,
@@ -60,6 +68,17 @@ public class TextureStitcher {
             GL_RGBA,
             GL_UNSIGNED_BYTE,
             new int[w * h]);
+        for (int i = 1; i <= MIPMAP_LEVEL; i++) {
+            glTexImage2D(GL_TEXTURE_2D,
+                i,
+                GL_RGBA,
+                w << i,
+                h << i,
+                0,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                new int[(w << i) * (h << i)]);
+        }
         var map = new HashMap<Identifier, SpriteAtlas.Info>();
         var keys = images.keySet().toArray(new Identifier[0]);
         for (int i = 0; i < blocks.length; i++) {

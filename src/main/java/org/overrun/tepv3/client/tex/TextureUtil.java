@@ -32,15 +32,15 @@ import java.util.HashMap;
  * @author squid233
  * @since 3.0.1
  */
-public class TextureMgr {
-    private static final HashMap<Identifier, Integer> TEX2D = new HashMap<>();
+public class TextureUtil {
+    private static final HashMap<Identifier, Integer> TEXTURES = new HashMap<>();
 
     public static int findTexture(Identifier id) {
-        return TEX2D.get(id);
+        return TEXTURES.get(id);
     }
 
     public static void putTexture(Identifier id,
                                   int glId) {
-        TEX2D.put(id, glId);
+        TEXTURES.put(id, glId);
     }
 }

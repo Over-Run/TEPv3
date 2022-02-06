@@ -22,28 +22,30 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
-
-import org.overrun.tepv3.client.gl.VertexBuilder;
-import org.overrun.tepv3.client.render.RenderSystem;
-import org.overrun.tepv3.client.render.VertexFormat;
+package org.overrun.tepv3.util;
 
 /**
- * <h2>The mesh</h2>
- * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
- * built model. You can use the mesh if you don't need to draw the scene
- * dynamically.
- *
  * @author squid233
  * @since 3.0.1
  */
-public interface IMesh {
-    /**
-     * Use current {@link RenderSystem} states to render.
-     */
-    void render();
+public class StringUtils {
+    public static String abbreviateMiddle(String str, String middle, int length) {
+        if (!isAnyEmpty(str, middle) && length < str.length() && length >= middle.length() + 2) {
+            int targetSting = length - middle.length();
+            int startOffset = targetSting / 2 + targetSting % 2;
+            int endOffset = str.length() - targetSting / 2;
+            return str.substring(0, startOffset) + middle + str.substring(endOffset);
+        }
+        return str;
+    }
 
-    float[] getRawData();
-
-    VertexFormat getFormat();
+    public static boolean isAnyEmpty(CharSequence... css) {
+        if (css == null || css.length == 0)
+            return true;
+        for (var cs : css) {
+            if (cs.isEmpty())
+                return true;
+        }
+        return false;
+    }
 }

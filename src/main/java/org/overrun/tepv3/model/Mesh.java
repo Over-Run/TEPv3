@@ -24,16 +24,18 @@
 
 package org.overrun.tepv3.model;
 
-import org.overrun.commonutils.FloatArray;
-import org.overrun.tepv3.gl.IVertexBuilder;
-import org.overrun.tepv3.gl.RenderSystem;
-import org.overrun.tepv3.gl.VertexFormat;
-import org.overrun.tepv3.gl.VertexLayout;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import it.unimi.dsi.fastutil.floats.FloatList;
+import org.overrun.tepv3.client.gl.IVertexBuilder;
+import org.overrun.tepv3.client.render.RenderSystem;
+import org.overrun.tepv3.client.render.VertexFormat;
+import org.overrun.tepv3.client.render.VertexFormatElement;
+import org.overrun.tepv3.client.render.VertexFormatElement.Type;
+import org.overrun.tepv3.client.render.VertexFormats;
 
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30.*;
-import static org.overrun.tepv3.gl.VertexFormat.*;
 
 /**
  * @author squid233
@@ -41,19 +43,19 @@ import static org.overrun.tepv3.gl.VertexFormat.*;
  */
 public class Mesh implements IMesh {
     private final float[] rawData;
-    private final VertexLayout layout;
+    private final VertexFormat format;
     private final int vertexCount;
     private boolean built;
     private int vao, vbo;
 
     public static class Builder implements IVertexBuilder {
-        private final FloatArray data = new FloatArray();
+        private final FloatList data = new FloatArrayList();
         private boolean quad;
         private boolean hasColor, hasTexture;
         private float x, y, z, r, g, b, a, u, v;
         private int vertexCount;
         private int vertexIndex;
-        private FloatArray buf0;
+        private FloatList buf0;
 
         /**
          * Enable quad building.
@@ -102,28 +104,24 @@ public class Mesh implements IMesh {
         }
 
         @Override
-        public void array(VertexLayout layout, float[] rawData) {
+        public void array(VertexFormat format, float[] rawData) {
             for (int i = 0; i < rawData.length; ) {
                 float x = 0, y = 0, z = 0, r = 0, g = 0, b = 0, a = 0, u = 0, v = 0;
-                for (var fmt : layout.getFormats()) {
-                    switch (fmt) {
-                        case VERTEX3F -> {
-                            x = rawData[i++];
-                            y = rawData[i++];
-                            z = rawData[i++];
-                        }
-                        case COLOR4F -> {
-                            hasColor = true;
-                            r = rawData[i++];
-                            g = rawData[i++];
-                            b = rawData[i++];
-                            a = rawData[i++];
-                        }
-                        case TEX2F -> {
-                            hasTexture = true;
-                            u = rawData[i++];
-                            v = rawData[i++];
-                        }
+                for (var element : format.getElements()) {
+                    if (element.isPosition()) {
+                        x = rawData[i++];
+                        y = rawData[i++];
+                        z = rawData[i++];
+                    } else if (element.getType() == Type.COLOR) {
+                        hasColor = true;
+                        r = rawData[i++];
+                        g = rawData[i++];
+                        b = rawData[i++];
+                        a = rawData[i++];
+                    } else if (element.getType() == Type.UV) {
+                        hasTexture = true;
+                        u = rawData[i++];
+                        v = rawData[i++];
                     }
                 }
                 next(x, y, z, r, g, b, a, u, v);
@@ -140,27 +138,51 @@ public class Mesh implements IMesh {
                          float a,
                          float u,
                          float v) {
-            data.addAll(x, y, z);
-            if (hasColor)
-                data.addAll(r, g, b, a);
-            if (hasTexture)
-                data.addAll(u, v);
+            data.add(x);
+            data.add(y);
+            data.add(z);
+            if (hasColor) {
+                data.add(r);
+                data.add(g);
+                data.add(b);
+                data.add(a);
+            }
+            if (hasTexture) {
+                data.add(u);
+                data.add(v);
+            }
             ++vertexCount;
             if (quad) {
                 if (buf0 == null)
-                    buf0 = new FloatArray();
+                    buf0 = new FloatArrayList();
                 if (vertexIndex == 0) {
-                    buf0.addAll(x, y, z);
-                    if (hasColor)
-                        buf0.addAll(r, g, b, a);
-                    if (hasTexture)
-                        buf0.addAll(u, v);
+                    buf0.add(x);
+                    buf0.add(y);
+                    buf0.add(z);
+                    if (hasColor) {
+                        buf0.add(r);
+                        buf0.add(g);
+                        buf0.add(b);
+                        buf0.add(a);
+                    }
+                    if (hasTexture) {
+                        buf0.add(u);
+                        buf0.add(v);
+                    }
                 } else if (vertexIndex == 2) {
-                    data.addAll(x, y, z);
-                    if (hasColor)
-                        data.addAll(r, g, b, a);
-                    if (hasTexture)
-                        data.addAll(u, v);
+                    data.add(x);
+                    data.add(y);
+                    data.add(z);
+                    if (hasColor) {
+                        data.add(r);
+                        data.add(g);
+                        data.add(b);
+                        data.add(a);
+                    }
+                    if (hasTexture) {
+                        data.add(u);
+                        data.add(v);
+                    }
                 }
                 ++vertexIndex;
 
@@ -179,33 +201,40 @@ public class Mesh implements IMesh {
         }
 
         public Mesh build() {
-            var fmt = new ArrayList<VertexFormat>();
-            fmt.add(VERTEX3F);
+            var fmt = new ArrayList<VertexFormatElement>();
+            fmt.add(VertexFormats.POSITION_ELEMENT);
             if (hasColor)
-                fmt.add(COLOR4F);
+                fmt.add(VertexFormats.COLOR_ELEMENT);
             if (hasTexture)
-                fmt.add(TEX2F);
-            return new Mesh(data.toFArray(),
-                new VertexLayout(fmt),
+                fmt.add(VertexFormats.TEXTURE_0_ELEMENT);
+            return new Mesh(data.toFloatArray(),
+                VertexFormat.fromElements(fmt),
                 vertexCount);
         }
     }
 
     public Mesh(float[] rawData,
-                VertexLayout layout,
+                VertexFormat format,
                 int vertexCount) {
         this.rawData = rawData;
-        this.layout = layout;
+        this.format = format;
         this.vertexCount = vertexCount;
     }
 
     @Override
     public void render() {
-        var shader = RenderSystem.getShader();
-        shader.use();
-        shader.setUniform("ProjMat", RenderSystem.getProjection());
-        shader.setUniform("ModelViewMat", RenderSystem.getModelView());
-        shader.setUniform("ColorModulator", RenderSystem.getShaderColor());
+        var shader = RenderSystem.getProgram();
+        shader.addSampler("Sampler0", RenderSystem.getShaderTexture(0));
+        if (shader.projMat != null) {
+            shader.projMat.set(RenderSystem.getProjection());
+        }
+        if (shader.modelViewMat != null) {
+            shader.modelViewMat.set(RenderSystem.getModelView());
+        }
+        if (shader.colorModulator != null) {
+            shader.colorModulator.set(RenderSystem.getProgramColor());
+        }
+        shader.bind();
         if (vao == 0)
             vao = glGenVertexArrays();
         glBindVertexArray(vao);
@@ -215,44 +244,12 @@ public class Mesh implements IMesh {
             built = true;
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferData(GL_ARRAY_BUFFER, rawData, GL_STATIC_DRAW);
-            var vars = shader.getVariables();
-            if (layout.hasPos()) {
-                var pos = vars.get("Position");
-                glEnableVertexAttribArray(pos.getLocation());
-                glVertexAttribPointer(pos.getLocation(),
-                    VERTEX3F.getCount(),
-                    GL_FLOAT,
-                    false,
-                    layout.getStride(),
-                    layout.getOffset(VERTEX3F));
-            }
-            if (layout.hasColor()) {
-                var color = vars.get("Color");
-                glEnableVertexAttribArray(color.getLocation());
-                glVertexAttribPointer(color.getLocation(),
-                    COLOR4F.getCount(),
-                    GL_FLOAT,
-                    false,
-                    layout.getStride(),
-                    layout.getOffset(COLOR4F));
-            }
-            if (layout.hasTexture()) {
-                var tex = vars.get("UV0");
-                shader.setUniform("Sampler0", 0);
-                RenderSystem.activeTexture(0);
-                glEnableVertexAttribArray(tex.getLocation());
-                glVertexAttribPointer(tex.getLocation(),
-                    TEX2F.getCount(),
-                    GL_FLOAT,
-                    false,
-                    layout.getStride(),
-                    layout.getOffset(TEX2F));
-            }
+            format.startDrawing();
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         glDrawArrays(GL_TRIANGLES, 0, vertexCount);
         glBindVertexArray(0);
-        shader.noUsing();
+        shader.unbind();
     }
 
     @Override
@@ -261,8 +258,8 @@ public class Mesh implements IMesh {
     }
 
     @Override
-    public VertexLayout getLayout() {
-        return layout;
+    public VertexFormat getFormat() {
+        return format;
     }
 
     public void free() {

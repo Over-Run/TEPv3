@@ -24,11 +24,11 @@
 
 package org.overrun.tepv3.client.world.render;
 
-import org.overrun.tepv3.client.Frustum;
+import org.overrun.tepv3.client.render.Frustum;
 import org.overrun.tepv3.client.tex.SpriteAtlasTextures;
 import org.overrun.tepv3.client.world.ClientChunk;
-import org.overrun.tepv3.gl.RenderSystem;
-import org.overrun.tepv3.world.DirtyChunkSorter;
+import org.overrun.tepv3.client.render.RenderSystem;
+import org.overrun.tepv3.client.world.DirtyChunkSorter;
 import org.overrun.tepv3.world.IWorldListener;
 import org.overrun.tepv3.world.World;
 import org.overrun.tepv3.world.entity.PlayerEntity;
@@ -96,14 +96,14 @@ public class WorldRenderer implements IWorldListener {
     }
 
     public void render(int layer) {
-        RenderSystem.setShaderTexture(SpriteAtlasTextures.BLOCK_ATLAS);
+        RenderSystem.setShaderTexture(0, SpriteAtlasTextures.BLOCK_ATLAS);
         var frustum = Frustum.getFrustum();
         for (var chunk : chunks) {
             if (frustum.testAab(chunk.box)) {
                 chunk.render(layer);
             }
         }
-        RenderSystem.setShaderTexture(0);
+        RenderSystem.setShaderTexture(0, 0);
     }
 
     public void updateDirtyChunks(PlayerEntity player) {

@@ -31,6 +31,28 @@ import org.joml.SimplexNoise;
  * @since 3.0.1
  */
 public class SimplexHeightmap {
+    private static float sumOctave(int numIterators,
+                                   float x,
+                                   float y,
+                                   float z,
+                                   float persistence,
+                                   float scale,
+                                   float low,
+                                   float high) {
+        float maxAmp = 0, amp = 1;
+        float freq = scale;
+        float noise = 0;
+        for (int i = 0; i < numIterators; i++) {
+            noise += SimplexNoise.noise(x * freq, y, z * freq) * amp;
+            maxAmp += amp;
+            amp *= persistence;
+            freq *= 2;
+        }
+        noise /= maxAmp;
+        noise = noise * (high - low) / 2.0f + (high + low) / 2.0f;
+        return noise;
+    }
+
     public static int[] generate(long seed,
                                  int w,
                                  int h,
@@ -38,10 +60,11 @@ public class SimplexHeightmap {
         final var arr = new int[w * d];
         final var invY = 1.0f / seed;
         final var scale = 2.0f / (w + d);
-        final var factor = h / 2.0f;
+//        final var factor = h / 2.0f;
         for (int x = 0; x < w; x++) {
             for (int z = 0; z < d; z++) {
-                arr[x + z * w] = (int) ((SimplexNoise.noise(x * scale, invY, z * scale) + 1) * factor);
+//                arr[x + z * w] = (int) ((SimplexNoise.noise(x * scale, invY, z * scale) + 1) * factor);
+                arr[x + z * w] = (int) sumOctave(16, x, invY, z, .5f, scale, 0, h);
             }
         }
         return arr;

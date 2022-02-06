@@ -22,64 +22,37 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.gl;
+package org.overrun.tepv3.util;
 
-import java.util.StringJoiner;
+import it.unimi.dsi.fastutil.Pair;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author squid233
  * @since 3.0.1
  */
-public enum VertexFormat {
-    VERTEX3F(12, 1, 3),
-    COLOR4F(16, 1 << 1, 4),
-    TEX2F(8, 1 << 2, 2);
+public class MapBuilder<K, V> {
+    private final List<Pair<K, V>> pairs = new ArrayList<>();
 
-    private final int bytes;
-    private final int mask;
-    private final int count;
-
-    VertexFormat(int bytes,
-                 int mask,
-                 int count) {
-        this.bytes = bytes;
-        this.mask = mask;
-        this.count = count;
+    public static <K, V> MapBuilder<K, V> create(K key, V value) {
+        var b = new MapBuilder<K, V>();
+        b.pairs.add(Pair.of(key, value));
+        return b;
     }
 
-    /**
-     * Get all bytes. For example: 4 floats are {@code (4*4)=16} bytes
-     *
-     * @return The bytes
-     */
-    public int getBytes() {
-        return bytes;
+    public MapBuilder<K, V> of(K key, V value) {
+        pairs.add(Pair.of(key, value));
+        return this;
     }
 
-    /**
-     * Get the mask
-     *
-     * @return The mask
-     */
-    public int getMask() {
-        return mask;
-    }
-
-    /**
-     * Get the type count. For example: 3F is 3, 4F is 4
-     *
-     * @return The type count
-     */
-    public int getCount() {
-        return count;
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", VertexFormat.class.getSimpleName() + "[", "]")
-            .add("bytes=" + bytes)
-            .add("mask=" + mask)
-            .add("count=" + count)
-            .toString();
+    public LinkedHashMap<K, V> build() {
+        var map = new LinkedHashMap<K, V>();
+        for (var pair : pairs) {
+            map.put(pair.key(), pair.value());
+        }
+        return map;
     }
 }

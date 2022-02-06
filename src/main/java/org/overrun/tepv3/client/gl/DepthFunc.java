@@ -22,32 +22,22 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.gl;
+package org.overrun.tepv3.client.gl;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
  * @since 3.0.1
  */
-public class ProgramVar {
-    private final String name;
-    private final VertexFormat vertexFormat;
-    int location;
-
-    public ProgramVar(String name,
-                      VertexFormat vertexFormat) {
-        this.name = name;
-        this.vertexFormat = vertexFormat;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public VertexFormat getVertexFormat() {
-        return vertexFormat;
-    }
-
-    public int getLocation() {
-        return location;
-    }
+public class DepthFunc {
+    public static final int
+        NEVER    = GL_NEVER,
+        LESS     = GL_LESS,
+        EQUAL    = GL_EQUAL,
+        LEQUAL   = GL_LEQUAL,
+        GREATER  = GL_GREATER,
+        NOTEQUAL = GL_NOTEQUAL,
+        GEQUAL   = GL_GEQUAL,
+        ALWAYS   = GL_ALWAYS;
 }

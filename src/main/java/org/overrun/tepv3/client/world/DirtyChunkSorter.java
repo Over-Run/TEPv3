@@ -22,10 +22,9 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.world;
+package org.overrun.tepv3.client.world;
 
-import org.overrun.tepv3.client.Frustum;
-import org.overrun.tepv3.client.world.ClientChunk;
+import org.overrun.tepv3.client.render.Frustum;
 import org.overrun.tepv3.world.entity.PlayerEntity;
 
 import java.util.Comparator;
