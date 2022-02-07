@@ -29,12 +29,14 @@ import org.lwjgl.opengl.GLUtil;
 import org.overrun.tepv3.client.gl.GLBlendFunc;
 import org.overrun.tepv3.client.gl.GLBlendState;
 import org.overrun.tepv3.client.gl.GLDepthFunc;
+import org.overrun.tepv3.client.model.BlockModelManager;
 import org.overrun.tepv3.client.render.Frustum;
 import org.overrun.tepv3.client.render.GameRenderer;
 import org.overrun.tepv3.client.render.RenderSystem;
+import org.overrun.tepv3.client.res.DefaultResourcePack;
 import org.overrun.tepv3.client.tex.SpriteAtlasTextures;
 import org.overrun.tepv3.client.world.render.WorldRenderer;
-import org.overrun.tepv3.model.Mesh;
+import org.overrun.tepv3.client.model.Mesh;
 import org.overrun.tepv3.scene.GLFWScene;
 import org.overrun.tepv3.util.registry.Registries;
 import org.overrun.tepv3.world.World;
@@ -49,11 +51,11 @@ import static org.overrun.tepv3.client.RunArgs.*;
  * @author squid233
  * @since 3.0.1
  */
-public class TEPv3Game extends GLFWScene {
+public class TEPv3Client extends GLFWScene {
     private static final boolean _DEBUG = false; // Change it on production
     private static final boolean ENABLE_MULTI_SAMPLE = false;
     public static final double SENSITIVITY = 0.15;
-    private static TEPv3Game instance;
+    private static TEPv3Client instance;
     private boolean isFirstMouse = true;
     private boolean isPausing = true;
     public GameRenderer gameRenderer;
@@ -61,9 +63,12 @@ public class TEPv3Game extends GLFWScene {
     public WorldRenderer worldRenderer;
     public PlayerEntity player;// todo player into world
     public Camera attachCamera;
+    public DefaultResourcePack defaultResourcePack;
+    public BlockModelManager blockModelManager;
+    @Deprecated(since = "3.0.1", forRemoval = true)
     public Mesh crossHair;
 
-    public TEPv3Game() {
+    public TEPv3Client() {
         super(INIT_WIDTH, INIT_HEIGHT, INIT_TITLE);
     }
 
@@ -154,6 +159,10 @@ public class TEPv3Game extends GLFWScene {
         builder.color(1, 1, 1, 0.5f).vertex(10, 2, 0).next();
         crossHair = builder.build();
 
+        defaultResourcePack = new DefaultResourcePack();
+        blockModelManager = new BlockModelManager(this);
+        blockModelManager.loadModels();
+
         SpriteAtlasTextures.generateAtlases();
     }
 
@@ -230,9 +239,9 @@ public class TEPv3Game extends GLFWScene {
         worldRenderer.free();
     }
 
-    public static TEPv3Game getInstance() {
+    public static TEPv3Client getInstance() {
         if (instance == null)
-            instance = new TEPv3Game();
+            instance = new TEPv3Client();
         return instance;
     }
 }

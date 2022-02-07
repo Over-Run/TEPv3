@@ -60,10 +60,8 @@ public class SimplexHeightmap {
         final var arr = new int[w * d];
         final var invY = 1.0f / seed;
         final var scale = 2.0f / (w + d);
-//        final var factor = h / 2.0f;
         for (int x = 0; x < w; x++) {
             for (int z = 0; z < d; z++) {
-//                arr[x + z * w] = (int) ((SimplexNoise.noise(x * scale, invY, z * scale) + 1) * factor);
                 arr[x + z * w] = (int) sumOctave(16, x, invY, z, .5f, scale, 0, h);
             }
         }

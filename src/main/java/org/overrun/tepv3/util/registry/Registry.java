@@ -29,6 +29,7 @@ import org.overrun.tepv3.util.Identifier;
 import org.overrun.tepv3.util.BiHashMap;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The registry table.
@@ -36,7 +37,7 @@ import java.util.Iterator;
  * @author squid233
  * @since 3.0.1
  */
-public class Registry<T> implements Iterable<T> {
+public class Registry<T> implements Iterable<Map.Entry<Identifier, T>> {
     protected final BiHashMap<Identifier, T> entryMap = new BiHashMap<>();
     protected final BiHashMap<Integer, T> rawIdMap = new BiHashMap<>();
     private final ResourceKey<T> resourceKey;
@@ -116,7 +117,7 @@ public class Registry<T> implements Iterable<T> {
 
     @NotNull
     @Override
-    public Iterator<T> iterator() {
-        return entryMap.values().iterator();
+    public Iterator<Map.Entry<Identifier, T>> iterator() {
+        return entryMap.entrySet().iterator();
     }
 }

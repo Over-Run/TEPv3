@@ -22,8 +22,10 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
+package org.overrun.tepv3.client.model;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.overrun.tepv3.client.gl.IVertexBuilder;
 import org.overrun.tepv3.client.render.RenderSystem;
 import org.overrun.tepv3.client.render.VertexFormat;
@@ -44,21 +46,21 @@ import static org.overrun.tepv3.client.gl.GLColor.toUbyte;
  */
 public class Mesh implements IMesh {
     private final ByteBuffer rawData;
+    private final int[] elementIndices;
     private final VertexFormat format;
     private final int vertexCount;
     private boolean built;
-    private int vao, vbo;
+    private int vao, vbo, ebo;
 
     public static class Builder implements IVertexBuilder {
         private int dataSz = 0x30000;
-        private int buf0Sz = 0x18;
         private ByteBuffer data = memAlloc(dataSz);
+        private IntList indices;
         private boolean quad;
         private boolean hasColor, hasTexture;
         private float x, y, z, r, g, b, a, u, v;
         private int vertexCount;
         private int vertexIndex;
-        private ByteBuffer buf0 = memAlloc(buf0Sz);
 
         /**
          * Enable quad building.
@@ -160,46 +162,19 @@ public class Mesh implements IMesh {
             }
             ++vertexCount;
             if (quad) {
-                if (buf0.capacity() - buf0.position() < 32) {
-                    buf0Sz += 0x18;
-                    buf0 = memRealloc(buf0, buf0Sz);
-                }
-                if (vertexIndex == 0) {
-                    buf0.putFloat(x)
-                        .putFloat(y)
-                        .putFloat(z);
-                    if (hasColor) {
-                        buf0.put((byte) toUbyte(r))
-                            .put((byte) toUbyte(g))
-                            .put((byte) toUbyte(b))
-                            .put((byte) toUbyte(a));
-                    }
-                    if (hasTexture) {
-                        buf0.putFloat(u)
-                            .putFloat(v);
-                    }
-                } else if (vertexIndex == 2) {
-                    data.putFloat(x)
-                        .putFloat(y)
-                        .putFloat(z);
-                    if (hasColor) {
-                        data.put((byte) toUbyte(r))
-                            .put((byte) toUbyte(g))
-                            .put((byte) toUbyte(b))
-                            .put((byte) toUbyte(a));
-                    }
-                    if (hasTexture) {
-                        data.putFloat(u)
-                            .putFloat(v);
-                    }
-                }
+                if (indices == null)
+                    indices = new IntArrayList();
                 ++vertexIndex;
 
                 if (vertexIndex == 4) {
                     vertexIndex = 0;
-                    data.put(buf0.flip());
-                    buf0.clear();
                     vertexCount += 2;
+                    indices.add(vertexCount - 6);
+                    indices.add(vertexCount - 5);
+                    indices.add(vertexCount - 4);
+                    indices.add(vertexCount - 4);
+                    indices.add(vertexCount - 3);
+                    indices.add(vertexCount - 6);
                 }
             }
         }
@@ -217,17 +192,19 @@ public class Mesh implements IMesh {
             if (hasTexture)
                 fmtList.add(VertexFormats.TEXTURE_0_ELEMENT);
             var fmt = VertexFormat.fromElements(fmtList);
-            memFree(buf0);
             return new Mesh(data.flip(),
+                indices != null ? indices.toIntArray() : null,
                 fmt,
                 vertexCount);
         }
     }
 
     public Mesh(ByteBuffer rawData,
+                int[] elementIndices,
                 VertexFormat format,
                 int vertexCount) {
         this.rawData = rawData;
+        this.elementIndices = elementIndices;
         this.format = format;
         this.vertexCount = vertexCount;
     }
@@ -254,10 +231,19 @@ public class Mesh implements IMesh {
             built = true;
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferData(GL_ARRAY_BUFFER, rawData, GL_STATIC_DRAW);
+            if (elementIndices != null) {
+                if (ebo == 0)
+                    ebo = glGenBuffers();
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementIndices, GL_STATIC_DRAW);
+            }
             format.startDrawing();
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        if (elementIndices != null)
+            glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
+        else
+            glDrawArrays(GL_TRIANGLES, 0, vertexCount);
         glBindVertexArray(0);
         shader.unbind();
     }
@@ -281,6 +267,10 @@ public class Mesh implements IMesh {
         if (glIsBuffer(vbo)) {
             glDeleteBuffers(vbo);
             vbo = 0;
+        }
+        if (glIsBuffer(ebo)) {
+            glDeleteBuffers(ebo);
+            ebo = 0;
         }
     }
 }

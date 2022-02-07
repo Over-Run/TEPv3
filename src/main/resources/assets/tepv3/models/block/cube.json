@@ -1,40 +1,26 @@
 {
   "elements": [
     {
-      "from": [
-        0,
-        0,
-        0
-      ],
-      "to": [
-        16,
-        16,
-        16
-      ],
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
       "faces": {
         "west": {
-          "name": "#west",
-          "cullFace": "west"
+          "name": "#west", "cullFace": "west"
         },
         "east": {
-          "name": "#east",
-          "cullFace": "east"
+          "name": "#east", "cullFace": "east"
         },
         "down": {
-          "name": "#down",
-          "cullFace": "down"
+          "name": "#down", "cullFace": "down"
         },
         "up": {
-          "name": "#up",
-          "cullFace": "up"
+          "name": "#up", "cullFace": "up"
         },
         "north": {
-          "name": "#north",
-          "cullFace": "north"
+          "name": "#north", "cullFace": "north"
         },
         "south": {
-          "name": "#south",
-          "cullFace": "south"
+          "name": "#south", "cullFace": "south"
         }
       }
     }

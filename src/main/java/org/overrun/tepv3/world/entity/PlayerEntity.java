@@ -25,7 +25,7 @@
 package org.overrun.tepv3.world.entity;
 
 import org.overrun.tepv3.client.Camera;
-import org.overrun.tepv3.client.TEPv3Game;
+import org.overrun.tepv3.client.TEPv3Client;
 import org.overrun.tepv3.world.World;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -44,7 +44,7 @@ public class PlayerEntity extends Entity {
 
     @Override
     public void turn(double yaw, double pitch) {
-        super.turn(yaw * TEPv3Game.SENSITIVITY, pitch * TEPv3Game.SENSITIVITY);
+        super.turn(yaw * TEPv3Client.SENSITIVITY, pitch * TEPv3Client.SENSITIVITY);
     }
 
     @Override

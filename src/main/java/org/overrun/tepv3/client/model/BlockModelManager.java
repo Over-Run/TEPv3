@@ -22,17 +22,52 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.client.main;
+package org.overrun.tepv3.client.model;
 
 import org.overrun.tepv3.client.TEPv3Client;
+import org.overrun.tepv3.util.Identifier;
+import org.overrun.tepv3.util.JsonHelper;
+import org.overrun.tepv3.util.registry.Registries;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author squid233
  * @since 3.0.1
  */
-public class Main {
-    public static void main(String[] args) {
-        var client = TEPv3Client.getInstance();
-        client.start();
+public class BlockModelManager {
+    private final Map<Identifier, BlockModel> models = new HashMap<>();
+    private final TEPv3Client client;
+
+    public BlockModelManager(TEPv3Client client) {
+        this.client = client;
+    }
+
+    /**
+     * Load models from {@link Registries#BLOCK registry table}.
+     */
+    public void loadModels() {
+        for (var e : Registries.BLOCK) {
+            if (e.getValue().isAir())
+                continue;
+            var id = e.getKey();
+            var resId = new Identifier(
+                id.getNamespace(),
+                "models/block/" + id.getPath() + ".json"
+            );
+            var res = client.defaultResourcePack.getResource(resId);
+            models.put(id, new BlockModel(JsonHelper.deserialize(res.content())));
+        }
+    }
+
+    /**
+     * Get a block model by an identifier.
+     *
+     * @param id The id
+     * @return The model
+     */
+    public BlockModel getModel(Identifier id) {
+        return models.get(id);
     }
 }

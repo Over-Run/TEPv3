@@ -24,25 +24,32 @@
 
 package org.overrun.tepv3.util;
 
-import java.util.Locale;
-
 /**
  * @author squid233
  * @since 3.0.1
  */
 public enum Direction {
-    WEST(0, 1, 1, -1, 0, 0),
-    EAST(1, 0, 3, 1, 0, 0),
-    DOWN(2, 3, 3, 0, -1, 0),
-    UP(3, 2, 1, 0, 1, 0),
-    NORTH(4, 5, 0, 0, 0, -1),
-    SOUTH(5, 4, 2, 0, 0, 1);
+    WEST("west", 0, 1, 1, -1, 0, 0),
+    EAST("east", 1, 0, 3, 1, 0, 0),
+    DOWN("down", 2, 3, 3, 0, -1, 0),
+    UP("up", 3, 2, 1, 0, 1, 0),
+    NORTH("north", 4, 5, 0, 0, 0, -1),
+    SOUTH("south", 5, 4, 2, 0, 0, 1);
+
+    private final String name;
     private final int id;
     private final int oppositeId;
     private final int horizontalId;
     private final int offsetX, offsetY, offsetZ;
 
-    Direction(int id, int oppositeId, int horizontalId, int offsetX, int offsetY, int offsetZ) {
+    Direction(String name,
+              int id,
+              int oppositeId,
+              int horizontalId,
+              int offsetX,
+              int offsetY,
+              int offsetZ) {
+        this.name = name;
         this.id = id;
         this.oppositeId = oppositeId;
         this.horizontalId = horizontalId;
@@ -56,7 +63,18 @@ public enum Direction {
     }
 
     public static Direction getByName(String name) {
-        return valueOf(name.toUpperCase(Locale.ROOT));
+        return switch (name) {
+            case "west" -> WEST;
+            case "east" -> EAST;
+            case "down" -> DOWN;
+            case "up" -> UP;
+            case "north" -> NORTH;
+            default -> SOUTH;
+        };
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getId() {
@@ -89,5 +107,10 @@ public enum Direction {
 
     public int getOffsetZ() {
         return offsetZ;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

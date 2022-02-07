@@ -22,17 +22,14 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.client.main;
+package org.overrun.tepv3.client.world.render;
 
-import org.overrun.tepv3.client.TEPv3Client;
+import org.overrun.tepv3.world.block.Block;
 
 /**
  * @author squid233
  * @since 3.0.1
  */
-public class Main {
-    public static void main(String[] args) {
-        var client = TEPv3Client.getInstance();
-        client.start();
-    }
+public class BlockRenderer {
+    public static void renderBlock(Block state) {}
 }

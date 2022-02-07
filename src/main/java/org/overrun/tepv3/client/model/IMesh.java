@@ -22,11 +22,30 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3;
+package org.overrun.tepv3.client.model;
+
+import org.overrun.tepv3.client.gl.VertexBuilder;
+import org.overrun.tepv3.client.render.RenderSystem;
+import org.overrun.tepv3.client.render.VertexFormat;
+
+import java.nio.ByteBuffer;
 
 /**
+ * <h2>The mesh</h2>
+ * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
+ * built model. You can use the mesh if you don't need to draw the scene
+ * dynamically.
+ *
  * @author squid233
  * @since 3.0.1
  */
-public class Keyboard {
+public interface IMesh {
+    /**
+     * Use current {@link RenderSystem} states to render.
+     */
+    void render();
+
+    ByteBuffer getRawData();
+
+    VertexFormat getFormat();
 }

@@ -22,31 +22,12 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.util;
-
-import it.unimi.dsi.fastutil.bytes.ByteList;
-
 /**
+ * The scene package.
+ *
  * @author squid233
  * @since 3.0.1
+ * @deprecated Don't use this package, it will be removed.
  */
-public class ByteUtil {
-    public static <T extends ByteList> T putFloat(T list,
-                                                  float f) {
-        int bits = Float.floatToRawIntBits(f);
-        list.add((byte) (bits >> 24));
-        list.add((byte) (bits >> 16));
-        list.add((byte) (bits >> 8));
-        list.add((byte) bits);
-        return list;
-    }
-
-    public static <T extends ByteList> T putFloats(T list,
-                                                   float... fs) {
-        for (var f : fs) {
-            putFloat(list, f);
-        }
-        return list;
-    }
-
-}
+@Deprecated(since = "3.0.1", forRemoval = true)
+package org.overrun.tepv3.scene;

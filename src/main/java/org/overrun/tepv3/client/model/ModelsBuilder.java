@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.model;
+package org.overrun.tepv3.client.model;
 
 import org.joml.Vector3f;
 

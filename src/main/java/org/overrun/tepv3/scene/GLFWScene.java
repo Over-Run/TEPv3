@@ -25,7 +25,7 @@
 package org.overrun.tepv3.scene;
 
 import org.lwjgl.opengl.GL;
-import org.overrun.tepv3.Window;
+import org.overrun.tepv3.client.Window;
 import org.overrun.tepv3.client.gl.VertexBuilder;
 import org.overrun.tepv3.util.Timer;
 

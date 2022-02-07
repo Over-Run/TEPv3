@@ -48,6 +48,19 @@ public class DefaultResourcePack implements IResourceFactory {
         if (RESOURCE_MAP.containsKey(id))
             return RESOURCE_MAP.get(id);
         var path = IResourceFactory.toPath(id);
+        if (ResourceType.MODELS.isSameAs(id)) {
+            var res = new Resource(ResourceType.MODELS,
+                id,
+                false,
+                BuiltinResources.getContent(path),
+                null) {
+                @Override
+                public void close() {
+                }
+            };
+            RESOURCE_MAP.put(id, res);
+            return res;
+        }
         if (ResourceType.SHADERS.isSameAs(id)) {
             var res = new Resource(ResourceType.SHADERS,
                 id,

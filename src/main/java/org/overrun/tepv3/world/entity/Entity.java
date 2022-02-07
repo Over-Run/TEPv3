@@ -27,7 +27,7 @@ package org.overrun.tepv3.world.entity;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
-import org.overrun.tepv3.client.TEPv3Game;
+import org.overrun.tepv3.client.TEPv3Client;
 import org.overrun.tepv3.world.World;
 import org.overrun.tepv3.phys.AABBox;
 
@@ -38,7 +38,7 @@ import static java.lang.Math.*;
  * @since 3.0.1
  */
 public class Entity {
-    protected final TEPv3Game client = TEPv3Game.getInstance();//todo split into client and server
+    protected final TEPv3Client client = TEPv3Client.getInstance();//todo split into client and server
     protected World world;
     public final Vector3d prevPos = new Vector3d();
     public final Vector3d position = new Vector3d();

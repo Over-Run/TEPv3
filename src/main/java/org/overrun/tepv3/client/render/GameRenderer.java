@@ -25,7 +25,7 @@
 package org.overrun.tepv3.client.render;
 
 import org.jetbrains.annotations.Nullable;
-import org.overrun.tepv3.client.TEPv3Game;
+import org.overrun.tepv3.client.TEPv3Client;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @since 3.0.1
  */
 public class GameRenderer implements AutoCloseable {
-    private final TEPv3Game client;
+    private final TEPv3Client client;
     private final Map<String, Program> programs = new HashMap<>();
     public Program blitScreenProgram;
     //@Nullable
@@ -47,7 +47,7 @@ public class GameRenderer implements AutoCloseable {
     @Nullable
     private static Program positionTexProgram;
 
-    public GameRenderer(TEPv3Game client) {
+    public GameRenderer(TEPv3Client client) {
         this.client = client;
     }
 
