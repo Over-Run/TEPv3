@@ -1,0 +1,44 @@
+name: Bug Report
+description: Report a bug to us
+title: '[TEPv3-number] Bug Title'
+labels: [ 'bug' ]
+assignees:
+  - squid233
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: What OS are you seeing the problem on?
+      placeholder: Windows 11
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of our game are you running?
+      placeholder: 3.0.1
+    validations:
+      required: true
+  - type: input
+    id: java-version
+    attributes:
+      label: Java Version
+      description: What version of Java are you running?
+      placeholder: TemurinJDK 17
+    validations:
+      required: false

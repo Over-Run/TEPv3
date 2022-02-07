@@ -54,6 +54,17 @@ public class BlockModel {
         private double[] from, to;
         private Faces faces;
 
+        public Element(double[] from,
+                       double[] to,
+                       Faces faces) {
+            this.from = from;
+            this.to = to;
+            this.faces = faces;
+        }
+
+        public Element() {
+        }
+
         /**
          * The element faces.
          *
@@ -143,7 +154,8 @@ public class BlockModel {
                 private String name;
                 private String cullFace;
 
-                public Face(String name, String cullFace) {
+                public Face(String name,
+                            String cullFace) {
                     this.name = name;
                     this.cullFace = cullFace;
                 }
@@ -160,6 +172,30 @@ public class BlockModel {
                     return Direction.getByName(cullFace);
                 }
             }
+        }
+
+        public double[] getFrom() {
+            return from;
+        }
+
+        public void setFrom(double[] from) {
+            this.from = from;
+        }
+
+        public double[] getTo() {
+            return to;
+        }
+
+        public void setTo(double[] to) {
+            this.to = to;
+        }
+
+        public Faces getFaces() {
+            return faces;
+        }
+
+        public void setFaces(Faces faces) {
+            this.faces = faces;
         }
     }
 
