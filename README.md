@@ -1,4 +1,4 @@
-# The Experimental Project v3
+# The Experimental Project v3 [![Java CI with Gradle](https://github.com/Over-Run/TEPv3/actions/workflows/gradle.yml/badge.svg?branch=3.0&event=push)](https://github.com/Over-Run/TEPv3/actions/workflows/gradle.yml)
 
 [English](README.md) · [简体中文](README-zh-cn.md)
 

@@ -43,7 +43,7 @@ import static org.lwjgl.system.MemoryUtil.memFree;
  * @since 3.0.1
  */
 public class SpriteAtlasTextures {
-    public static final Identifier BLOCK_ATLAS = new Identifier("textures/block-atlas");
+    public static final Identifier BLOCK_ATLAS = new Identifier("textures/atlas/block.png");
     private static final HashMap<Identifier, SpriteAtlas> ATLASES = new HashMap<>();
     private static final int[] MISSING_TEXTURE = {
         0xfff800f8, 0xff000000,

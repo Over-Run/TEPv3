@@ -25,54 +25,167 @@
 package org.overrun.tepv3.client;
 
 import org.joml.Vector3d;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.tepv3.client.gl.GLBlendFunc;
 import org.overrun.tepv3.client.gl.GLBlendState;
 import org.overrun.tepv3.client.gl.GLDepthFunc;
-import org.overrun.tepv3.client.model.BlockModelManager;
+import org.overrun.tepv3.client.gl.VertexBuilder;
+import org.overrun.tepv3.client.render.model.BlockModelManager;
+import org.overrun.tepv3.client.render.model.Mesh;
 import org.overrun.tepv3.client.render.Frustum;
 import org.overrun.tepv3.client.render.GameRenderer;
 import org.overrun.tepv3.client.render.RenderSystem;
 import org.overrun.tepv3.client.res.DefaultResourcePack;
 import org.overrun.tepv3.client.tex.SpriteAtlasTextures;
 import org.overrun.tepv3.client.world.render.WorldRenderer;
-import org.overrun.tepv3.client.model.Mesh;
-import org.overrun.tepv3.scene.GLFWScene;
+import org.overrun.tepv3.util.Timer;
 import org.overrun.tepv3.util.registry.Registries;
 import org.overrun.tepv3.world.World;
 import org.overrun.tepv3.world.entity.PlayerEntity;
 
+import static java.lang.Math.floor;
 import static java.lang.Math.toRadians;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFWErrorCallback.createPrint;
 import static org.lwjgl.system.Configuration.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.overrun.tepv3.Configs.*;
 import static org.overrun.tepv3.client.RunArgs.*;
 
 /**
+ * The client implemented using GLFW.
+ * <h2>The running pipeline</h2>
+ * <table>
+ *     <tr><th>The method</th>
+ *         <th>The description</th>
+ *     </tr>
+ *     <tr><td>{@link #onStarting()}</td>
+ *         <td>It will be called on calling {@link #start()}.</td>
+ *     </tr>
+ *     <tr><td>{@link #setWindowHints()}</td>
+ *         <td>It will be called on setting window hints.</td>
+ *     </tr>
+ *     <tr><td>{@link #init()}</td>
+ *         <td>It will be called after {@link GL#createCapabilities(boolean) creating} OpenGL capabilities.</td>
+ *     </tr>
+ *     <tr><td>{@link #tick()}</td>
+ *         <td>It will be called on ticking.</td>
+ *     </tr>
+ *     <tr><td>{@link #render(double)}</td>
+ *         <td>It will be called on rendering.</td>
+ *     </tr>
+ * </table>
+ * Any methods are overridable.
+ *
  * @author squid233
  * @since 3.0.1
  */
-public class TEPv3Client extends GLFWScene {
+public class TEPv3Client implements Runnable, AutoCloseable {
     private static final boolean _DEBUG = false; // Change it on production
     private static final boolean ENABLE_MULTI_SAMPLE = false;
     public static final double SENSITIVITY = 0.15;
     private static TEPv3Client instance;
     private boolean isFirstMouse = true;
     private boolean isPausing = true;
+    private final Window window = new Window();
+    /**
+     * The timer with config tps
+     */
+    protected final Timer timer = new Timer(tps);
+    /**
+     * Cursor pos
+     */
+    protected int mouseX, mouseY, deltaMX, deltaMY;
+    /**
+     * The {@link Viewport.Mutable viewport}
+     */
+    protected Viewport.Mutable viewport;
     public GameRenderer gameRenderer;
     public World world;
     public WorldRenderer worldRenderer;
     public PlayerEntity player;// todo player into world
     public Camera attachCamera;
     public DefaultResourcePack defaultResourcePack;
-    public BlockModelManager blockModelManager;
     @Deprecated(since = "3.0.1", forRemoval = true)
     public Mesh crossHair;
 
     public TEPv3Client() {
-        super(INIT_WIDTH, INIT_HEIGHT, INIT_TITLE);
+        viewport = new Viewport.Mutable(INIT_WIDTH, INIT_HEIGHT);
+        window.setTitle(INIT_TITLE);
+    }
+
+    public final void start() {
+        onStarting();
+        if (glfwErrorCallback == null) {
+            glfwErrorCallback = createPrint(System.err);
+        }
+        glfwErrorCallback.set();
+        if (!glfwInit())
+            glfwInitFailed.run();
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        setWindowHints();
+        window.create(getWidth(), getHeight(), window.getTitle(), NULL, NULL);
+        window.check(glfwWindowCreateFailed);
+        window.onKey(this::onKey);
+        window.onCursorPos((handle, xpos, ypos) -> {
+            int nx = (int) floor(xpos), ny = (int) floor(ypos);
+            deltaMX = nx - mouseX;
+            deltaMY = ny - mouseY;
+            onCursorPos(nx, ny, deltaMX, deltaMY);
+            mouseX = nx;
+            mouseY = ny;
+            deltaMX = 0;
+            deltaMY = 0;
+        });
+        window.onResizing((handle, width, height) -> {
+            viewport.setWidth(width);
+            viewport.setHeight(height);
+            resize(width, height);
+        });
+        window.makeCtxCurrent();
+        glfwSwapInterval(swapInterval);
+        GL.createCapabilities(true);
+        resize(getWidth(), getHeight());
+        init();
+        window.show();
+        run();
+        close();
     }
 
     @Override
+    public final void run() {
+        while (!window.shouldClose()) {
+            timer.advanceTime();
+            for (int i = 0; i < timer.ticks; i++) {
+                tick();
+            }
+            render(timer.delta);
+            window.swapBuffers();
+            glfwPollEvents();
+        }
+    }
+
+    @Override
+    public final void close() {
+        VertexBuilder.freeResources();
+        onClosing();
+        GL.setCapabilities(null);
+        window.freeCallbacks();
+        window.destroy();
+        glfwTerminate();
+        var pCb = glfwSetErrorCallback(null);
+        if (pCb != null)
+            pCb.free();
+    }
+
+    /**
+     * It will be called on calling {@link #start()}.
+     */
     public void onStarting() {
         if (_DEBUG) { //#ifdef _DEBUG
             DEBUG.set(true);
@@ -83,7 +196,9 @@ public class TEPv3Client extends GLFWScene {
         }
     }
 
-    @Override
+    /**
+     * It will be called on setting window hints.
+     */
     public void setWindowHints() {
         if (_DEBUG) { //#ifdef _DEBUG
             glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
@@ -93,7 +208,6 @@ public class TEPv3Client extends GLFWScene {
         }
     }
 
-    @Override
     public void onKey(long window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS) {
             if (key == GLFW_KEY_ESCAPE) {
@@ -106,7 +220,6 @@ public class TEPv3Client extends GLFWScene {
         }
     }
 
-    @Override
     public void onCursorPos(int x, int y, int deltaX, int deltaY) {
         if (isFirstMouse) {
             x = mouseX = getWidth() / 2;
@@ -120,7 +233,6 @@ public class TEPv3Client extends GLFWScene {
         }
     }
 
-    @Override
     public void init() {
         if (_DEBUG) { //#ifdef _DEBUG
             GLUtil.setupDebugMessageCallback(System.err);
@@ -160,13 +272,13 @@ public class TEPv3Client extends GLFWScene {
         crossHair = builder.build();
 
         defaultResourcePack = new DefaultResourcePack();
-        blockModelManager = new BlockModelManager(this);
-        blockModelManager.loadModels();
 
         SpriteAtlasTextures.generateAtlases();
     }
 
-    @Override
+    /**
+     * It will be called on ticking.
+     */
     public void tick() {
         player.tick();
     }
@@ -195,7 +307,11 @@ public class TEPv3Client extends GLFWScene {
         moveCameraToPlayer(delta);
     }
 
-    @Override
+    /**
+     * It will be called on rendering.
+     *
+     * @param delta The timer delta
+     */
     public void render(double delta) {
         RenderSystem.clearColorBuf();
         RenderSystem.clearDepthBuf();
@@ -228,15 +344,68 @@ public class TEPv3Client extends GLFWScene {
         GLBlendState.activeBlendState = null;
     }
 
-    @Override
     public void resize(int width, int height) {
         RenderSystem.setViewport(0, 0, width, height);
     }
 
-    @Override
-    public void onExiting() {
+    /**
+     * It will be called on calling {@link #close()}.
+     */
+    public void onClosing() {
         gameRenderer.close();
         worldRenderer.free();
+    }
+
+    public Window getWindow() {
+        return window;
+    }
+
+    public void setTitle(String title) {
+        window.setTitle(title);
+    }
+
+    public String getTitle() {
+        return window.getTitle();
+    }
+
+    /**
+     * Get the width of the viewport.
+     *
+     * @return The width
+     */
+    public int getWidth() {
+        return viewport.getWidth();
+    }
+
+    /**
+     * Set the width of the viewport.
+     *
+     * @param width The width.
+     */
+    public void setWidth(int width) {
+        viewport.setWidth(width);
+    }
+
+    /**
+     * Get the height of the viewport.
+     *
+     * @return The height
+     */
+    public int getHeight() {
+        return viewport.getHeight();
+    }
+
+    /**
+     * Set the height of the viewport.
+     *
+     * @param height The height.
+     */
+    public void setHeight(int height) {
+        viewport.setHeight(height);
+    }
+
+    public float getAspectRatiof() {
+        return (float) getWidth() / (float) getHeight();
     }
 
     public static TEPv3Client getInstance() {

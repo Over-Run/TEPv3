@@ -22,47 +22,28 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.event;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+package org.overrun.tepv3.client;
 
 /**
- * <h2>The Event</h2>
- * The events are triggered on custom operating.
- * <h3>Creating Events</h3>
- * To create event, you should use the {@link EventFactory#create create}
- * method.
- * <p>
- * Here is the example:<br>
- * <pre><code>@FunctionalInterface
-public interface PlayerMoveEvent {
-    ListBackedEvent&lt;PlayerMoveEvent&gt; EVENT = create(events -> (x, y) -> {
-        for (var event : events)
-            event.onMoving(x, y);
-    });
-
-    void onMoving(double x, double y);
-}</code></pre>
- * </p>
+ * This is the interface of the viewport object.
+ * <h2>The Viewport</h2>
+ * The viewport object contains the size in width and height.
  *
  * @author squid233
  * @since 3.0.1
  */
-public class ListBackedEvent<T> {
-    private final Function<List<T>, T> factory;
-    private final List<T> listeners = new ArrayList<>();
+public interface IViewport {
+    /**
+     * Get the width of the viewport.
+     *
+     * @return The width
+     */
+    int getWidth();
 
-    public ListBackedEvent(Function<List<T>, T> factory) {
-        this.factory = factory;
-    }
-
-    public void register(T event) {
-        listeners.add(event);
-    }
-
-    public T onEvent() {
-        return factory.apply(listeners);
-    }
+    /**
+     * Get the height of the viewport.
+     *
+     * @return The height
+     */
+    int getHeight();
 }

@@ -26,7 +26,7 @@ package org.overrun.tepv3.world;
 
 import org.overrun.tepv3.world.block.Block;
 import org.overrun.tepv3.world.block.Blocks;
-import org.overrun.tepv3.phys.AABBox;
+import org.overrun.tepv3.client.phys.AABBox;
 
 import java.util.ArrayList;
 import java.util.Random;

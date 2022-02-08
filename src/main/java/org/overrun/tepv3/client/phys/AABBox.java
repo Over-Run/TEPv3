@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.phys;
+package org.overrun.tepv3.client.phys;
 
 import org.joml.Vector3d;
 import org.joml.Vector3dc;

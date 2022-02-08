@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
+package org.overrun.tepv3.client.render.model;
+
 /**
- * The scene package.
- *
  * @author squid233
  * @since 3.0.1
- * @deprecated Don't use this package, it will be removed.
  */
-@Deprecated(since = "3.0.1", forRemoval = true)
-package org.overrun.tepv3.scene;
+public interface IBakedModel {
+}

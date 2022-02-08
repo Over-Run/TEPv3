@@ -28,8 +28,8 @@ import org.overrun.tepv3.client.world.render.BlockRenderType;
 import org.overrun.tepv3.world.Chunk;
 import org.overrun.tepv3.world.World;
 import org.overrun.tepv3.world.entity.Entity;
-import org.overrun.tepv3.client.model.Mesh;
-import org.overrun.tepv3.phys.AABBox;
+import org.overrun.tepv3.client.render.model.Mesh;
+import org.overrun.tepv3.client.phys.AABBox;
 
 import static java.lang.Math.fma;
 

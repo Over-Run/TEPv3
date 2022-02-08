@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.client.model;
+package org.overrun.tepv3.client.render.model;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;

@@ -29,7 +29,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.overrun.tepv3.client.TEPv3Client;
 import org.overrun.tepv3.world.World;
-import org.overrun.tepv3.phys.AABBox;
+import org.overrun.tepv3.client.phys.AABBox;
 
 import static java.lang.Math.*;
 

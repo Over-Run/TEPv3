@@ -22,58 +22,30 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.scene;
+package org.overrun.tepv3.client.render.model;
+
+import org.overrun.tepv3.client.gl.VertexBuilder;
+import org.overrun.tepv3.client.render.RenderSystem;
+import org.overrun.tepv3.client.render.VertexFormat;
+
+import java.nio.ByteBuffer;
 
 /**
- * The implementation of {@link IViewport}.
+ * <h2>The mesh</h2>
+ * Not like the {@link VertexBuilder VertexBuilder}, the mesh is static
+ * built model. You can use the mesh if you don't need to draw the scene
+ * dynamically.
  *
  * @author squid233
  * @since 3.0.1
  */
-public record Viewport(int width, int height)
-    implements IViewport {
+public interface IMesh {
     /**
-     * The mutable edition of {@link Viewport}.
-     *
-     * @author squid233
-     * @since 3.0.1
+     * Use current {@link RenderSystem} states to render.
      */
-    public static class Mutable {
-        private int width, height;
+    void render();
 
-        public Mutable(int width, int height) {
-            this.width = width;
-            this.height = height;
-        }
+    ByteBuffer getRawData();
 
-        public int getWidth() {
-            return width;
-        }
-
-        public void setWidth(int width) {
-            this.width = width;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
-        }
-    }
-
-    public Mutable toMutable() {
-        return new Mutable(width, height);
-    }
-
-    @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
+    VertexFormat getFormat();
 }

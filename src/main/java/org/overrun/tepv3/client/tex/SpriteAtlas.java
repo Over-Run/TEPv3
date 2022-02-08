@@ -44,7 +44,8 @@ public class SpriteAtlas extends Resource {
     public SpriteAtlas(
         Identifier id,
         HashMap<Identifier, Info> infoMap,
-        int width, int height, int glId) {
+        int width, int height, int glId
+    ) {
         super(ResourceType.TEXTURES,
             id,
             true,

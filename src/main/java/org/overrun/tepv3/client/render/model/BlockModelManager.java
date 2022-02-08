@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.client.model;
+package org.overrun.tepv3.client.render.model;
 
 import org.overrun.tepv3.client.TEPv3Client;
 import org.overrun.tepv3.util.Identifier;
@@ -36,6 +36,7 @@ import java.util.Map;
  * @author squid233
  * @since 3.0.1
  */
+@Deprecated(since = "3.0.1", forRemoval = true)
 public class BlockModelManager {
     private final Map<Identifier, BlockModel> models = new HashMap<>();
     private final TEPv3Client client;

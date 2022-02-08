@@ -1,6 +1,6 @@
 {
   "parent": "tepv3:block/cube_all",
-  "defines": {
-    "texture": "tepv3:block/stone"
+  "textures": {
+    "all": "tepv3:block/stone"
   }
 }

@@ -22,28 +22,33 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.scene;
+package org.overrun.tepv3.client.render.model;
+
+import it.unimi.dsi.fastutil.Pair;
+import org.overrun.tepv3.client.util.SpriteIdentifier;
+import org.overrun.tepv3.util.Identifier;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
- * This is the interface of the viewport object.
- * <h2>The Viewport</h2>
- * The viewport object contains the size in width and height.
- *
  * @author squid233
  * @since 3.0.1
  */
-public interface IViewport {
-    /**
-     * Get the width of the viewport.
-     *
-     * @return The width
-     */
-    int getWidth();
+public class JsonBakedModel implements IUnbakedModel {
+    @Override
+    public Collection<Identifier> getParent() {
+        return null;
+    }
 
-    /**
-     * Get the height of the viewport.
-     *
-     * @return The height
-     */
-    int getHeight();
+    @Override
+    public Collection<SpriteIdentifier> getTextureDep(Function<Identifier, IUnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureRefs) {
+        return null;
+    }
+
+    @Override
+    public IBakedModel bake(Identifier modelId) {
+        return null;
+    }
 }

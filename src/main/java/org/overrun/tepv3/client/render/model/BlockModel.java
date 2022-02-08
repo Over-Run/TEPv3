@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.client.model;
+package org.overrun.tepv3.client.render.model;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -37,6 +37,7 @@ import static org.overrun.tepv3.util.JsonHelper.*;
  * @author squid233
  * @since 3.0.1
  */
+@Deprecated(since = "3.0.1", forRemoval = true)
 public class BlockModel {
     private final JsonObject json;
 

@@ -22,65 +22,40 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.phys;
+package org.overrun.tepv3.client.phys;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
+ * Voxel shape with single an {@link AABBox}
+ *
  * @author squid233
  * @since 3.0.1
  */
-public class VoxelShapes {
-    private static final VoxelShape EMPTY = new VoxelShape() {
-        @Override
-        public List<AABBox> getBoxes() {
-            return List.of();
-        }
+public class SingleVoxelShape extends VoxelShape {
+    private final AABBox box;
+    private final List<AABBox> list;
 
-        @Override
-        public boolean isEmpty() {
-            return true;
-        }
-
-        @NotNull
-        @Override
-        public Iterator<AABBox> iterator() {
-            return new Iterator<>() {
-                @Override
-                public boolean hasNext() {
-                    return false;
-                }
-
-                @Override
-                public AABBox next() {
-                    throw new NoSuchElementException();
-                }
-            };
-        }
-    };
-    private static final SingleVoxelShape FULL_CUBE =
-        cuboid(0, 0, 0, 1, 1, 1);
-
-    public static VoxelShape empty() {
-        return EMPTY;
+    public SingleVoxelShape(AABBox box) {
+        this.box = box;
+        list = List.of(box);
     }
 
-    public static SingleVoxelShape fullCube() {
-        return FULL_CUBE;
+    public AABBox getBox() {
+        return box;
     }
 
-    public static SingleVoxelShape cuboid(
-        double minX,
-        double minY,
-        double minZ,
-        double maxX,
-        double maxY,
-        double maxZ
-    ) {
-        return new SingleVoxelShape(new AABBox(minX, minY, minZ, maxX, maxY, maxZ));
+    @Override
+    public List<AABBox> getBoxes() {
+        return list;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<AABBox> iterator() {
+        return list.iterator();
     }
 }

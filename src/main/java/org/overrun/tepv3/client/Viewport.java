@@ -22,40 +22,58 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.phys;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Iterator;
-import java.util.List;
+package org.overrun.tepv3.client;
 
 /**
- * Voxel shape with single an {@link AABBox}
+ * The implementation of {@link IViewport}.
  *
  * @author squid233
  * @since 3.0.1
  */
-public class SingleVoxelShape extends VoxelShape {
-    private final AABBox box;
-    private final List<AABBox> list;
+public record Viewport(int width, int height)
+    implements IViewport {
+    /**
+     * The mutable edition of {@link Viewport}.
+     *
+     * @author squid233
+     * @since 3.0.1
+     */
+    public static class Mutable {
+        private int width, height;
 
-    public SingleVoxelShape(AABBox box) {
-        this.box = box;
-        list = List.of(box);
+        public Mutable(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
     }
 
-    public AABBox getBox() {
-        return box;
+    public Mutable toMutable() {
+        return new Mutable(width, height);
     }
 
     @Override
-    public List<AABBox> getBoxes() {
-        return list;
+    public int getWidth() {
+        return width;
     }
 
-    @NotNull
     @Override
-    public Iterator<AABBox> iterator() {
-        return list.iterator();
+    public int getHeight() {
+        return height;
     }
 }

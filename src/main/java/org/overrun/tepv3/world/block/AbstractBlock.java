@@ -26,8 +26,8 @@ package org.overrun.tepv3.world.block;
 
 import org.overrun.tepv3.client.world.render.BlockRenderType;
 import org.overrun.tepv3.world.World;
-import org.overrun.tepv3.phys.VoxelShape;
-import org.overrun.tepv3.phys.VoxelShapes;
+import org.overrun.tepv3.client.phys.VoxelShape;
+import org.overrun.tepv3.client.phys.VoxelShapes;
 
 import java.util.Random;
 

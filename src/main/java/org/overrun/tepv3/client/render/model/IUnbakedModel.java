@@ -22,51 +22,25 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.scene;
+package org.overrun.tepv3.client.render.model;
+
+import it.unimi.dsi.fastutil.Pair;
+import org.overrun.tepv3.client.util.SpriteIdentifier;
+import org.overrun.tepv3.util.Identifier;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
- * <h2>The Scene</h2>
- * In TEPv3, the scene is the most important object. It is the highest-level
- * API.
- *
  * @author squid233
  * @since 3.0.1
  */
-public class Scene implements IViewport {
-    /**
-     * The {@link Viewport.Mutable viewport}
-     */
-    protected Viewport.Mutable viewport;
+public interface IUnbakedModel {
+    Collection<Identifier> getParent();
 
-    @Override
-    public int getWidth() {
-        return viewport.getWidth();
-    }
+    Collection<SpriteIdentifier> getTextureDep(Function<Identifier, IUnbakedModel> unbakedModelGetter,
+                                               Set<Pair<String, String>> unresolvedTextureRefs);
 
-    /**
-     * Set the width of the viewport.
-     *
-     * @param width The width.
-     */
-    public void setWidth(int width) {
-        viewport.setWidth(width);
-    }
-
-    @Override
-    public int getHeight() {
-        return viewport.getHeight();
-    }
-
-    /**
-     * Set the height of the viewport.
-     *
-     * @param height The height.
-     */
-    public void setHeight(int height) {
-        viewport.setHeight(height);
-    }
-
-    public float getAspectRatiof() {
-        return (float) getWidth() / (float) getHeight();
-    }
+    IBakedModel bake(Identifier modelId);
 }

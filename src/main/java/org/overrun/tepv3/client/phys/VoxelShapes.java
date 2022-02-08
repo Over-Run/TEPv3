@@ -22,27 +22,65 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.phys;
+package org.overrun.tepv3.client.phys;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @author squid233
  * @since 3.0.1
  */
-public abstract class VoxelShape implements Iterable<AABBox> {
-    public abstract List<AABBox> getBoxes();
+public class VoxelShapes {
+    private static final VoxelShape EMPTY = new VoxelShape() {
+        @Override
+        public List<AABBox> getBoxes() {
+            return List.of();
+        }
 
-    public boolean isEmpty() {
-        return getBoxes().isEmpty();
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @NotNull
+        @Override
+        public Iterator<AABBox> iterator() {
+            return new Iterator<>() {
+                @Override
+                public boolean hasNext() {
+                    return false;
+                }
+
+                @Override
+                public AABBox next() {
+                    throw new NoSuchElementException();
+                }
+            };
+        }
+    };
+    private static final SingleVoxelShape FULL_CUBE =
+        cuboid(0, 0, 0, 1, 1, 1);
+
+    public static VoxelShape empty() {
+        return EMPTY;
     }
 
-    @NotNull
-    @Override
-    public Iterator<AABBox> iterator() {
-        return getBoxes().iterator();
+    public static SingleVoxelShape fullCube() {
+        return FULL_CUBE;
+    }
+
+    public static SingleVoxelShape cuboid(
+        double minX,
+        double minY,
+        double minZ,
+        double maxX,
+        double maxY,
+        double maxZ
+    ) {
+        return new SingleVoxelShape(new AABBox(minX, minY, minZ, maxX, maxY, maxZ));
     }
 }

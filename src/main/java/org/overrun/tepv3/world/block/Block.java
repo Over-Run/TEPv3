@@ -24,7 +24,7 @@
 
 package org.overrun.tepv3.world.block;
 
-import org.overrun.tepv3.client.model.Mesh;
+import org.overrun.tepv3.client.render.model.Mesh;
 import org.overrun.tepv3.util.Direction;
 import org.overrun.tepv3.util.Identifier;
 import org.overrun.tepv3.util.registry.Registries;

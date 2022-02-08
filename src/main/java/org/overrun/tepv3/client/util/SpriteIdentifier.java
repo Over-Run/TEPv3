@@ -22,47 +22,28 @@
  * SOFTWARE.
  */
 
-package org.overrun.tepv3.event;
+package org.overrun.tepv3.client.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+import org.overrun.tepv3.util.Identifier;
 
 /**
- * <h2>The Event</h2>
- * The events are triggered on custom operating.
- * <h3>Creating Events</h3>
- * To create event, you should use the {@link EventFactory#create create}
- * method.
- * <p>
- * Here is the example:<br>
- * <pre><code>@FunctionalInterface
-public interface PlayerMoveEvent {
-    ListBackedEvent&lt;PlayerMoveEvent&gt; EVENT = create(events -> (x, y) -> {
-        for (var event : events)
-            event.onMoving(x, y);
-    });
-
-    void onMoving(double x, double y);
-}</code></pre>
- * </p>
- *
  * @author squid233
  * @since 3.0.1
  */
-public class ListBackedEvent<T> {
-    private final Function<List<T>, T> factory;
-    private final List<T> listeners = new ArrayList<>();
+public class SpriteIdentifier {
+    private final Identifier atlas;
+    private final Identifier texture;
 
-    public ListBackedEvent(Function<List<T>, T> factory) {
-        this.factory = factory;
+    public SpriteIdentifier(Identifier atlas, Identifier texture) {
+        this.atlas = atlas;
+        this.texture = texture;
     }
 
-    public void register(T event) {
-        listeners.add(event);
+    public Identifier getAtlasId() {
+        return atlas;
     }
 
-    public T onEvent() {
-        return factory.apply(listeners);
+    public Identifier getTextureId() {
+        return texture;
     }
 }
